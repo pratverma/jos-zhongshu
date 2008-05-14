@@ -1,0 +1,451 @@
+diff -r -u fs.bak/fs.c fs/fs.c
+--- fs.bak/fs.c	2008-05-11 13:02:19.000000000 +0800
++++ fs/fs.c	2008-05-03 17:14:31.000000000 +0800
+@@ -53,7 +53,7 @@
+ {
+ 	if (block_is_mapped(blockno))
+ 		return 0;
+-	return sys_page_alloc(0, diskaddr(blockno), PTE_U|PTE_P|PTE_W);
++	return sys_page_alloc(0, diskaddr(blockno), PTE_U|PTE_P|PTE_W|PTE_SHARE);
+ }
+ 
+ // Make sure a particular disk block is loaded into memory.
+@@ -67,23 +67,35 @@
+ {
+ 	int r;
+ 	char *addr;
+-	//cprintf("super->s_nblocks:%08x\n",super->s_nblocks);
++
+ 	if (super && blockno >= super->s_nblocks)
+ 		panic("reading non-existent block %08x\n", blockno);
+ 
+ 	if (bitmap && block_is_free(blockno))
+ 		panic("reading free block %08x\n", blockno);
+-	if(map_block(blockno))
+-		panic("mapping block failed %08x\n", blockno);
++
+ 	addr = diskaddr(blockno);
+-	if(ide_read(blockno*BLKSIZE/SECTSIZE, addr, BLKSIZE/SECTSIZE))
+-		panic("ide read error %08x\n",blockno);
+-	if(blk != 0)
++
++	// the block has already been read
++	if (block_is_mapped(blockno)) {
++		if (blk)
++			*blk = addr;
++		return 0;
++	}
++
++	// otherwise, allocate a new page,
++	// and read it into memory
++	r = sys_page_alloc(0, addr, PTE_U| PTE_P| PTE_W |PTE_SHARE);
++	if (r < 0)
++		return r;
++
++	r = ide_read(blockno * BLKSECTS, addr, BLKSECTS);
++	if (r < 0)
++		return r;
++
++	if (blk)
+ 		*blk = addr;
+-	else
+-		return -E_FAULT;
+-	// LAB 5: Your code here.
+-	//panic("read_block not implemented");
++
+ 	return 0;
+ }
+ 
+@@ -95,20 +107,18 @@
+ write_block(uint32_t blockno)
+ {
+ 	char *addr;
++	int r;
+ 
+ 	if (!block_is_mapped(blockno))
+ 		panic("write unmapped block %08x", blockno);
+-	addr = diskaddr(blockno);
+-	//write to disk only if this blockno is dirty, otherwise just do nothing
+-	if((vpt[VPN(addr)] & PTE_D))
+-	{	
+-		if(ide_write(blockno*BLKSIZE/SECTSIZE, diskaddr(blockno), BLKSIZE/SECTSIZE))
+-			panic("ide write failed %08x\n", blockno);
+-		sys_page_map(0,diskaddr(blockno),0,diskaddr(blockno),PTE_USER & ~PTE_D);
+-	}	
++	
+ 	// Write the disk block and clear PTE_D.
+ 	// LAB 5: Your code here.
+-	//panic("write_block not implemented");
++	addr = diskaddr(blockno);
++	if ((r = ide_write(blockno * BLKSECTS, addr, BLKSECTS)) < 0)
++		panic("ide write error: %e", r);
++	if ((r = sys_page_map(0, addr, 0, addr, PTE_USER)) < 0)
++		panic("sys page map error: %e", r);
+ }
+ 
+ // Make sure this block is unmapped.
+@@ -157,22 +167,15 @@
+ alloc_block_num(void)
+ {
+ 	// LAB 5: Your code here.
+-	uint32_t blockno = 2;
+-	uint32_t i;
+-	while(blockno <= super->s_nblocks)
+-	{
+-		if(block_is_free(blockno))
+-		{
+-			bitmap[blockno/32] &= ~(1<<(blockno%32));
+-			for(i = 0; i < 1 + super->s_nblocks/BLKBITSIZE;i++)
+-				write_block(2 + i);
+-			return blockno;
++	int i;
++
++	for (i = 0; i < super->s_nblocks; i++) {
++		if (block_is_free(i)) {
++			bitmap[i / 32] &= ~(1 << (i % 32));
++			write_block(i / BLKBITSIZE + 2);
++			return i;
+ 		}
+-		blockno++;
+ 	}
+-		
+-
+-	//panic("alloc_block_num not implemented");
+ 	return -E_NO_DISK;
+ }
+ 
+@@ -230,7 +233,7 @@
+ read_bitmap(void)
+ {
+ 	int r;
+-	uint32_t i,bitmapblock;
++	uint32_t i, n;
+ 	char *blk;
+ 
+ 	// Read the bitmap into memory.
+@@ -241,15 +244,12 @@
+ 	// Hint: Use read_block.
+ 
+ 	// LAB 5: Your code here.
+-	//cprintf("read bitmap:super->s_nblocks:%08x\n", super->s_nblocks);
+-	//cprintf("blkbitsize:%08x\n",BLKBITSIZE);
+-	for(i = 0; i < 1 + super->s_nblocks/BLKBITSIZE;i++)
+-	{
+-		if(read_block(2 + i,&blk))
+-			panic("read_bitmap failed\n");
+-		if(i == 0)
+-			bitmap = (uint32_t*)blk;
+-	}
++	n = super->s_nblocks / BLKBITSIZE;
++	cprintf("read the nblocks: %d.\n", n);
++	read_block(2, &blk);
++	bitmap = (uint32_t *)blk;
++	for (i = 1; i < n; i++)
++		read_block(i + 2, NULL);
+ 
+ 	// Make sure the reserved and root blocks are marked in-use.
+ 	assert(!block_is_free(0));
+@@ -258,8 +258,9 @@
+ 
+ 	// Make sure that the bitmap blocks are marked in-use.
+ 	// LAB 5: Your code here.
+-	for(bitmapblock = 0;bitmapblock < i;bitmapblock++)
+-		assert(!block_is_free(2 + bitmapblock));
++	for (i = 0; i < n; i++)
++		assert(!block_is_free(i + 2));
++
+ 	cprintf("read_bitmap is good\n");
+ }
+ 
+@@ -413,15 +414,13 @@
+ 	int r;
+ 	uint32_t diskbno;
+ 
+-
+ 	// Read in the block, leaving the pointer in *blk.
+ 	// Hint: Use file_map_block and read_block.
+ 	// LAB 5: Your code here.
+-	if((r = file_map_block(f, filebno, &diskbno, 1)) < 0)
++	if ((r = file_map_block(f, filebno, &diskbno, 1)) < 0)
+ 		return r;
+-	if((r = read_block(diskbno, blk)) < 0)
++	if ((r = read_block(diskbno, blk)) < 0)
+ 		return r;
+-	//panic("file_get_block not implemented");
+ 	return 0;
+ }
+ 
+@@ -590,12 +589,12 @@
+ {
+ 	// Hint: Use walk_path.
+ 	// LAB 5: Your code here.
+-	struct File *dir;
+-	char name[MAXNAMELEN];
++	struct File *dir, *f;
+ 	int r;
+-	if((r = walk_path(path, &dir, pf, name)) < 0)
+-		return r;		
+-	//panic("file_open not implemented");
++
++	if ((r = walk_path(path, &dir, &f, 0)) < 0)
++		return r;
++	*pf = f;
+ 	return 0;
+ }
+ 
+@@ -613,29 +612,28 @@
+ {
+ 	int r;
+ 	uint32_t bno, old_nblocks, new_nblocks;
+-	uint32_t ooff = 0;
+-	uint32_t noff = 0;
+-	uint32_t i;
+-	if(f->f_size % BLKSIZE)
+-		ooff = 1;
+-	if(newsize % BLKSIZE)
+-		noff = 1;
+-	old_nblocks = f->f_size / BLKSIZE + ooff; 
+-	new_nblocks = newsize / BLKSIZE + noff;
++
+ 	// Hint: Use file_clear_block and/or free_block.
+-	// LAB 5: Your code here.
+-	for(bno = new_nblocks; bno < old_nblocks;bno++)
+-	{
+-		if((r = file_clear_block(f, bno)) != 0)
+-			panic("file clear block error:%e",r);
+-	}
+-	if(new_nblocks < NINDIRECT && f->f_indirect != 0)
+-	{
+-		if((r = file_clear_block(f,f->f_indirect)) != 0)
+-			panic("file clear block error:%e",r);
+-		f->f_indirect = 0;
++	for (old_nblocks = 0; old_nblocks < f->f_size; old_nblocks += BLKSIZE)
++		;
++	old_nblocks /= BLKSIZE;
++	for (new_nblocks = 0; new_nblocks < newsize; new_nblocks += BLKSIZE)
++		;
++	new_nblocks /= BLKSIZE;
++	cprintf("truncate from %d[%d] -> %d[%d].\n", f->f_size, new_nblocks, f->f_size, old_nblocks);
++	for (bno = new_nblocks; bno <= old_nblocks; bno++)
++		if ((r = file_clear_block(f, bno)) < 0)
++			panic("file clear block error: %e\n", r);
++
++	// Yeah, we need to clear the extra block as well
++	if (new_nblocks < NDIRECT) {
++		if (f->f_indirect != 0) {
++			free_block(f->f_indirect);
++			f->f_indirect = 0;
++		}
++		while (new_nblocks < NDIRECT)
++			f->f_direct[new_nblocks++] = 0;
+ 	}
+-	//panic("file_truncate_blocks not implemented");
+ }
+ 
+ int
+@@ -659,25 +657,17 @@
+ file_flush(struct File *f)
+ {
+ 	// LAB 5: Your code here.
+-	uint32_t file_nblocks;
+-	uint32_t off = 0;
+-	uint32_t i = 0;
++	int i, n, r;
+ 	uint32_t diskbno;
+-	int r;
+-	if(f->f_size % BLKSIZE)
+-		off = 1;
+-	file_nblocks = f->f_size / BLKSIZE + off;
+-	for(i = 0; i < file_nblocks; i++)
+-	{
+-		if((r = file_map_block(f, i, &diskbno, 0)) < 0)
+-			panic("file map block error:%e",r);
+-		if(block_is_dirty(diskbno))
+-		{
+-			//cprintf("dirty,flush %s\n",f->f_name);
++
++	for (i = 0; i < f->f_size; i += BLKSIZE) {
++		if ((r = file_map_block(f, i/BLKSIZE, &diskbno, 0)) < 0)
++			panic("file map block error: %e", r);
++		if (block_is_dirty(diskbno))
+ 			write_block(diskbno);
+-		}
++		//if (f->f_indirect && block_is_dirty(f->f_indirect))
++			//write_block(f->f_indirect);
+ 	}
+-	//panic("file_flush not implemented");
+ }
+ 
+ // Sync the entire file system.  A big hammer.
+@@ -694,7 +684,6 @@
+ void
+ file_close(struct File *f)
+ {
+-	//cprintf("file close flush %s\n",f->f_name);
+ 	file_flush(f);
+ 	if (f->f_dir)
+ 		file_flush(f->f_dir);
+Only in fs.bak: .fs.c.swp
+diff -r -u fs.bak/Makefrag fs/Makefrag
+--- fs.bak/Makefrag	2007-11-20 09:24:47.000000000 +0800
++++ fs/Makefrag	2008-05-03 17:14:31.000000000 +0800
+@@ -36,7 +36,6 @@
+ 			fs/testshell.out \
+ 			fs/testshell.sh
+ 
+-
+ FSIMGFILES := $(FSIMGTXTFILES) $(USERAPPS)
+ 
+ $(OBJDIR)/fs/%.o: fs/%.c fs/fs.h inc/lib.h
+diff -r -u fs.bak/serv.c fs/serv.c
+--- fs.bak/serv.c	2008-05-11 13:01:41.000000000 +0800
++++ fs/serv.c	2008-05-03 17:14:31.000000000 +0800
+@@ -52,7 +52,7 @@
+ 	for (i = 0; i < MAXOPEN; i++) {
+ 		switch (pageref(opentab[i].o_fd)) {
+ 		case 0:
+-			if ((r = sys_page_alloc(0, opentab[i].o_fd, PTE_P|PTE_U|PTE_W)) < 0)
++			if ((r = sys_page_alloc(0, opentab[i].o_fd, PTE_P|PTE_U|PTE_W|PTE_SHARE)) < 0)
+ 				return r;
+ 			/* fall through */
+ 		case 1:
+@@ -204,64 +204,56 @@
+ 	// by using ipc_send.
+ 	// Map read-only unless the file's open mode (o->o_mode) allows writes
+ 	// (see the O_ flags in inc/lib.h).
+-	uint32_t ol = rq->req_offset / BLKSIZE;
+-	if((r = openfile_lookup(envid, rq->req_fileid,&o)) < 0)
+-		goto out;
+-	if((r = file_get_block(o->o_file, ol, &blk)) < 0)
+-		goto out;
+-	if (ol < NDIRECT)
+-        	o->o_fd->fd_file.file.f_direct[ol] = o->o_file->f_direct[ol];
+-    	else
+-        	o->o_fd->fd_file.file.f_indirect = o->o_file->f_indirect;
+-	perm = PTE_P|PTE_U|PTE_SHARE;
+-	//cprintf("o_mode:%08x\n",o->o_mode);
+-	if((o->o_mode & O_WRONLY) || (o->o_mode & O_RDWR))
+-		perm|=PTE_W;
+-	ipc_send(envid, r, blk, perm);
+-	return;
+-out:
+-	ipc_send(envid, r, 0, 0);
+-	
+-	// LAB 5: Your code here.
+-	//panic("serve_map not implemented");
++	if ((r = openfile_lookup(envid, rq->req_fileid, &o)) < 0)
++		ipc_send(envid, r, 0, 0);
++	if ((r = file_get_block(o->o_file, rq->req_offset / BLKSIZE, &blk)) < 0)
++		ipc_send(envid, r, 0, 0);
++
++	perm = PTE_P |PTE_U |PTE_SHARE;
++	if ((o->o_mode & O_WRONLY) ||
++	    (o->o_mode & O_RDWR))
++		perm |= PTE_W;
++
++	ipc_send(envid, 0, blk, perm);
+ }
+ 
+ void
+ serve_close(envid_t envid, struct Fsreq_close *rq)
+ {
+ 	struct OpenFile *o;
+-	int r;
++	int r = 0;
+ 
+ 	if (debug)
+ 		cprintf("serve_close %08x %08x\n", envid, rq->req_fileid);
+ 
+-	// Close the file.
+-	if((r = openfile_lookup(envid, rq->req_fileid, &o)) < 0)
++	if ((r = openfile_lookup(envid, rq->req_fileid, &o)) < 0)
+ 		goto out;
+-	file_close(o->o_file);
+-	//cprintf("pageref o_fd:%08x\n",pageref(o->o_fd));	
+-	/*if (pageref(o->o_fd) == 2) {
++
++	// unmap o->o_fd only when the client side
++	// has already unmapped the 'fd' page.
++	// the logic below is that the server side
++	// unmap the o_fd page only when it is
++	// the last reference.
++	if (pageref(o->o_fd) == 1) {
+ 		sys_page_unmap(0, o->o_fd);
+ 		// make the fileid to the original
+ 		// so that stale fileid is not available
+ 		// notice that, when o_fileid is less than MAXOPEN,
+ 		// it means that it is a stale file id.
+ 		o->o_fileid = o->o_fileid % MAXOPEN;
+-	}*/
+-	//if(pageref(o->o_fd) == 1)
+-	//	sys_page_unmap(0, o->o_fd);
+-	//cprintf("serve close pageref of fd:%08x\n",pageref(o->o_fd));
++	}
++	// close the file (fs/fs.c)
++	file_close(o->o_file);
++
+ out:
+ 	ipc_send(envid, r, 0, 0);
+-	// LAB 5: Your code here.
+-	//panic("serve_close not implemented");
+ }
+ 
+ void
+ serve_remove(envid_t envid, struct Fsreq_remove *rq)
+ {
+ 	char path[MAXPATHLEN];
+-	int r;
++	int r, len;
+ 
+ 	if (debug)
+ 		cprintf("serve_remove %08x %s\n", envid, rq->req_path);
+@@ -269,14 +261,15 @@
+ 	// Delete the named file.
+ 	// Note: This request doesn't refer to an open file.
+ 	// Hint: Make sure the path is null-terminated!
+-	memmove(path, rq->req_path, MAXPATHLEN);
+-	path[MAXPATHLEN-1] = 0;
+-	if((r = file_remove(path)) < 0)
+-		goto out;
+-out:
+-	ipc_send(envid, r, 0, 0);
++
+ 	// LAB 5: Your code here.
+-	//panic("serve_remove not implemented");
++	len = strlen(rq->req_path);
++	memmove(path, rq->req_path, len);
++	path[len] = '\0';
++	if ((r = file_remove(path)) < 0)
++		ipc_send(envid, r, 0, 0);
++
++	ipc_send(envid, 0, 0, 0);
+ }
+ 
+ void
+@@ -290,18 +283,14 @@
+ 
+ 	// Mark the page containing the requested file offset as dirty.
+ 	// Returns 0 on success, < 0 on error.
+-	if((r = openfile_lookup(envid, rq->req_fileid, &o)) < 0)
+-		goto out;
+-
+-	if((r = file_dirty(o->o_file,rq->req_offset)) < 0)
+-		goto out;
+-out:
+-	ipc_send(envid, r, 0, 0);
+-
+-
+-		
++	
+ 	// LAB 5: Your code here.
+-	//panic("serve_dirty not implemented");
++	if ((r = openfile_lookup(envid, rq->req_fileid, &o)) < 0)
++		ipc_send(envid, r, 0, 0);
++	if ((r = file_dirty(o->o_file, rq->req_offset)) < 0)
++		ipc_send(envid, r, 0, 0);
++
++	ipc_send(envid, 0, 0, 0);
+ }
+ 
+ void
+Only in fs.bak: .serv.c.swp
