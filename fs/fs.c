@@ -76,8 +76,8 @@ read_block(uint32_t blockno, char **blk)
 		panic("reading free block %08x\n", blockno);
 	/*
 	 * map_block here is nightmare
-	 * Remember if blockno has already been mapped, we should NOT read it again from IDE
-	 * Otherwise, it will ruin the file that has not been written back to the IDE
+	 * Remember if blockno has already been mapped, we should NOT read it again from disk
+	 * Otherwise, it will ruin the file that has not been written back to the disk
 	 */
 	if((r = map_block(blockno)) < 0)
 		panic("mapping block failed %e\n", r);
