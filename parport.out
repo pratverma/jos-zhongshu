@@ -1,0 +1,67 @@
+6828 decimal is 15254 octal!
+Physical memory: 32768K available, base = 640K, extended = 31744K
+Alloc page directory
+Alloc pages array
+Alloc envs array
+check_page_alloc() succeeded!
+page_check() succeeded!
+trap_syscall: 306a006a
+&trap_syscall: f0103f38
+enabled interrupts: 1 2 4
+	     Setup timer interrupts via 8259A
+enabled interrupts: 0 1 2 4
+	     unmasked timer interrupt
+env create 00001000
+env create 00001001
+env create 00001002
+fd_alloc
+FS is running
+FS can do I/O
+Device 1 presence: 1
+fd_alloc
+superblock is good
+_pgfault_upcall:00802a10
+set pgfault up call successfully
+write_block is good
+exofork env_id:00001003,child->env_pgfault_upcall:00802a10
+read_bitmap is good
+pgfault_upcall:00802a10
+fault va:eebfdf20
+err:00000007
+tf->tf_esp:eebfffcc
+alloc_block is good
+addr:eebfdf20
+envid:00001003,_pgfault_upcall:00802a10
+file_open is good
+set pgfault up call successfully
+[00001002] pipereadeof close 0
+unmap the fd:00000002
+unmap the pipe:00000004
+pgfault_upcall:00802a10
+fault va:eebfdf30
+err:00000007
+tf->tf_esp:eebfffcc
+user panic in fs at fs/test.c:52: file_get_block returned wrong data[00001002] pipereadeof write 1
+addr:eebfdf30
+
+Welcome to the JOS kernel monitor!
+Type 'help' for a list of commands.
+TRAP frame at 0xf022107c
+  edi  0x00000000
+  esi  0x00000000
+  ebp  0xeebfdf90
+  oesp 0xefbfffdc
+  ebx  0x00804bd4
+  edx  0xeebfde60
+  ecx  0x00000001
+  eax  0x00000001
+  es   0x----0023
+  ds   0x----0023
+  trap 0x00000003 Breakpoint
+  err  0x00000000
+  eip  0x00802089
+  cs   0x----001b
+  flag 0x00003296
+  esp  0xeebfdf78
+  ss   0x----0023
+K> 
