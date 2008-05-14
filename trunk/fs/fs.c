@@ -74,9 +74,11 @@ read_block(uint32_t blockno, char **blk)
 
 	if (bitmap && block_is_free(blockno))
 		panic("reading free block %08x\n", blockno);
-	//map_block here is nightmare
-	//Remember if blockno has already been mapped, we should NOT read it again from IDE
-	//Otherwise, it will ruin the file that has not been written back to the IDE
+	/*
+	 * map_block here is nightmare
+	 * Remember if blockno has already been mapped, we should NOT read it again from IDE
+	 * Otherwise, it will ruin the file that has not been written back to the IDE
+	 */
 	if((r = map_block(blockno)) < 0)
 		panic("mapping block failed %e\n", r);
 	else if(r == 1)
