@@ -41,10 +41,8 @@ i386_init(void)
 	// Lab 4 multitasking initialization functions
 	pic_init();
 	kclock_init();
-
 	// Should always have an idle process as first one.
 	ENV_CREATE(user_idle);
-	//cprintf("create user idle successfully\n");
 
 	// Start fs.
 	ENV_CREATE(fs_fs);

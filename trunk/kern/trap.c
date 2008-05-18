@@ -62,9 +62,9 @@ void
 idt_init(void)
 {
 	extern struct Segdesc gdt[];
-		
-	extern uint32_t _idt_entry[];
-	
+
+	//_idt_entry, _irqhandler and trap_syscall are defined trapentry.S	
+	extern uint32_t _idt_entry[];	
 	extern uint32_t _irqhandler[];
 	extern uint32_t trap_syscall;        
 	uint32_t i,istrap,dpl;
@@ -73,6 +73,8 @@ idt_init(void)
 	{
 		istrap = 1;
 		dpl = 0;
+		// trap 9 and trap 15 are reserved but no need to use
+		// But we have reserved their slot in our idt
 		if(i == 9 || i == 15)
 			continue;
 		if(i == T_NMI)

@@ -15,6 +15,12 @@
  * a trap.  It pushes a trap number onto the stack, then jumps to _alltraps.
  * Use TRAPHANDLER for traps where the CPU automatically pushes an error code.
  */
+//SETDATA(name) is used to automatically generate the table we need
+//e.g _idt_entry and _irqhandler. It is just like an array
+//pay attention to .data and .text
+//These two directives are used to switch between data and code in at&t asm
+//I hate AT&T assembly!!!!!!!!!!
+
 #define SETDATA(name) .data;.long name; 
 #define TRAPHANDLER(name, num)						\
   	SETDATA(name);                                                      \
@@ -41,6 +47,7 @@
 	pushl $(num);							\
 	jmp _alltraps
 
+//This place defines the _idt_entry
 .data
 	.globl _idt_entry
 _idt_entry:
@@ -73,6 +80,7 @@ _idt_entry:
     TRAPHANDLER_NOEC(trap_simderr, T_SIMDERR);
     TRAPHANDLER_NOEC(trap_syscall, T_SYSCALL);
 
+//this place defines _irqhandler
 .data
 	.globl _irqhandler
 _irqhandler:
