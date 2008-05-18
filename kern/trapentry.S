@@ -14,8 +14,11 @@
 /* The TRAPHANDLER macro defines a globally-visible function for handling
  * a trap.  It pushes a trap number onto the stack, then jumps to _alltraps.
  * Use TRAPHANDLER for traps where the CPU automatically pushes an error code.
- */ 
+ */
+#define SETDATA(name) .data;.long name; 
 #define TRAPHANDLER(name, num)						\
+  	SETDATA(name);                                                      \
+        .text;                                                          \
 	.globl name;		/* define global symbol for 'name' */	\
 	.type name, @function;	/* symbol type is function */		\
 	.align 2;		/* align function definition */		\
@@ -28,6 +31,8 @@
  * format in either case.
  */
 #define TRAPHANDLER_NOEC(name, num)					\
+        SETDATA(name);                                                     \
+        .text;                                                          \
 	.globl name;							\
 	.type name, @function;						\
 	.align 2;							\
@@ -35,6 +40,10 @@
 	pushl $0;							\
 	pushl $(num);							\
 	jmp _alltraps
+
+.data
+	.globl _idt_entry
+_idt_entry:
 
 .text
 
@@ -51,16 +60,25 @@
     TRAPHANDLER_NOEC(trap_illop, T_ILLOP);
     TRAPHANDLER_NOEC(trap_device, T_DEVICE);
     TRAPHANDLER(trap_dblflt, T_DBLFLT);
+    TRAPHANDLER_NOEC(trap_coproc, T_COPROC);
     TRAPHANDLER(trap_tss, T_TSS);
     TRAPHANDLER(trap_segnp, T_SEGNP);
     TRAPHANDLER(trap_stack, T_STACK);
     TRAPHANDLER(trap_gpflt, T_GPFLT);
     TRAPHANDLER(trap_pgflt, T_PGFLT);
+    TRAPHANDLER_NOEC(trap_res, T_RES);
     TRAPHANDLER_NOEC(trap_fperr, T_FPERR);
     TRAPHANDLER_NOEC(trap_align, T_ALIGN);
     TRAPHANDLER_NOEC(trap_mchk, T_MCHK);
     TRAPHANDLER_NOEC(trap_simderr, T_SIMDERR);
     TRAPHANDLER_NOEC(trap_syscall, T_SYSCALL);
+
+.data
+	.globl _irqhandler
+_irqhandler:
+
+.text
+
     TRAPHANDLER_NOEC(irq0, IRQ_OFFSET);
     TRAPHANDLER_NOEC(irq1, IRQ_OFFSET + 1);
     TRAPHANDLER_NOEC(irq2, IRQ_OFFSET + 2);
@@ -114,4 +132,5 @@ _alltraps:
     //iret will recover the state of the env which cause the interrupt or exception
     iret;
 	
+
 

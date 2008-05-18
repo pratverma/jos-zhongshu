@@ -62,83 +62,45 @@ void
 idt_init(void)
 {
 	extern struct Segdesc gdt[];
-	        extern uint32_t trap_divide, 
-                    trap_debug,
-                    trap_nmi,
-                    trap_brkpt,
-                    trap_oflow,
-                    trap_bound,
-                    trap_illop,
-                    trap_device,
-                    trap_dblflt,
-                    trap_tss,
-                    trap_segnp,
-                    trap_stack,
-                    trap_gpflt,
-                    trap_pgflt,
-                    trap_fperr,
-                    trap_align,
-                    trap_mchk,
-                    trap_simderr,
-		    irq0,
-		    irq1,
-		    irq2,
-		    irq3,
-     		    irq4,
-		    irq5,
-		    irq6,
-  		    irq7,
-   		    irq8,
-        	    irq9,
-                    irq10,
-		    irq11,
-		    irq12,
-		    irq13,
-		    irq14,
-		    irq15,
-                    trap_syscall;
+		
+	extern uint32_t _idt_entry[];
+	
+	extern uint32_t _irqhandler[];
+	extern uint32_t trap_syscall;        
+	uint32_t i,istrap,dpl;
+	
+	for(i = 0; i <= T_SIMDERR; i++)
+	{
+		istrap = 1;
+		dpl = 0;
+		if(i == 9 || i == 15)
+			continue;
+		if(i == T_NMI)
+			istrap = 0;
+		if(i == T_BRKPT)
+			dpl = 3;
+	      	SETGATE(idt[i],istrap,GD_KT,_idt_entry[i],dpl);
+	}
 
-        SETGATE(idt[T_DIVIDE], 1, GD_KT, &trap_divide, 0);
-        SETGATE(idt[T_DEBUG], 1, GD_KT, &trap_debug, 0);
-        SETGATE(idt[T_NMI], 0, GD_KT, &trap_nmi, 0);
-        SETGATE(idt[T_BRKPT], 1, GD_KT, &trap_brkpt, 3);
-        SETGATE(idt[T_OFLOW], 1, GD_KT, &trap_oflow, 0);
-        SETGATE(idt[T_BOUND], 1, GD_KT, &trap_bound, 0);
-        SETGATE(idt[T_ILLOP], 1, GD_KT, &trap_illop, 0);
-        SETGATE(idt[T_DEVICE], 1, GD_KT, &trap_device, 0);
-        SETGATE(idt[T_DBLFLT], 1, GD_KT, &trap_dblflt, 0);
-        SETGATE(idt[T_TSS], 1, GD_KT, &trap_tss, 0);
-        SETGATE(idt[T_SEGNP], 1, GD_KT, &trap_segnp, 0);
-        SETGATE(idt[T_STACK], 1, GD_KT, &trap_stack, 0);
-        SETGATE(idt[T_GPFLT], 1, GD_KT, &trap_gpflt, 0);
-        SETGATE(idt[T_PGFLT], 1, GD_KT, &trap_pgflt, 0);
-        SETGATE(idt[T_FPERR], 1, GD_KT, &trap_fperr, 0);
-        SETGATE(idt[T_ALIGN], 1, GD_KT, &trap_align, 0);
-        SETGATE(idt[T_MCHK], 1, GD_KT, &trap_mchk, 0);
-        SETGATE(idt[T_SIMDERR], 1, GD_KT, &trap_simderr, 0);
-	SETGATE(idt[IRQ_OFFSET], 1,GD_KT, &irq0, 0);
-	SETGATE(idt[IRQ_OFFSET + 1], 0,GD_KT, &irq1, 3);	
-	SETGATE(idt[IRQ_OFFSET + 2], 0,GD_KT, &irq2, 3);	
-	SETGATE(idt[IRQ_OFFSET + 3], 0,GD_KT, &irq3, 3);	
-	SETGATE(idt[IRQ_OFFSET + 4], 0,GD_KT, &irq4, 3);	
-	SETGATE(idt[IRQ_OFFSET + 5], 0,GD_KT, &irq5, 3);	
-	SETGATE(idt[IRQ_OFFSET + 6], 0,GD_KT, &irq6, 3);	
-	SETGATE(idt[IRQ_OFFSET + 7], 0,GD_KT, &irq7, 3);	
-	SETGATE(idt[IRQ_OFFSET + 8], 0,GD_KT, &irq8, 3);	
-	SETGATE(idt[IRQ_OFFSET + 9], 0,GD_KT, &irq9, 3);	
-	SETGATE(idt[IRQ_OFFSET + 10], 0,GD_KT, &irq10, 3);	
-	SETGATE(idt[IRQ_OFFSET + 11], 0,GD_KT, &irq11, 3);	
-	SETGATE(idt[IRQ_OFFSET + 12], 0,GD_KT, &irq12, 3);	
-	SETGATE(idt[IRQ_OFFSET + 13], 0,GD_KT, &irq13, 3);	
-	SETGATE(idt[IRQ_OFFSET + 14], 0,GD_KT, &irq14, 3);	
-	SETGATE(idt[IRQ_OFFSET + 15], 0,GD_KT, &irq15, 3);	
+	
+		
+	for(i = 0; i< MAX_IRQS; i++)
+	{
+		istrap = 0;
+		dpl = 3;
+		if(i == 0)
+		{
+			istrap = 1;
+			dpl = 0;
+		}
+
+		SETGATE(idt[IRQ_OFFSET + i], istrap, GD_KT, _irqhandler[i],dpl);
+	}
 
 
-        SETGATE(idt[T_SYSCALL], 0, GD_KT, &trap_syscall, 3);
-        
-        //cprintf("trap_syscall: %x\n", trap_syscall);
-        //cprintf("&trap_syscall: %x\n", &trap_syscall);
+	SETGATE(idt[T_SYSCALL],0,GD_KT, &trap_syscall,3);
 
+       
 	// Setup a TSS so that we get the right stack
 	// when we trap to the kernel.
 	ts.ts_esp0 = KSTACKTOP;
