@@ -11,8 +11,12 @@
 #define JOS_MULTIENV 0
 #endif
 
+//The initial ticket assigned to one specific env
+#define INIT_TICKET (1<<10)
+
 extern struct Env *envs;		// All environments
 extern struct Env *curenv;	        // Current environment
+extern uint32_t global_tickets;         // The sum of all the current tickets
 
 LIST_HEAD(Env_list, Env);		// Declares 'struct Env_list'
 

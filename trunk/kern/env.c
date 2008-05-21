@@ -16,6 +16,7 @@
 struct Env *envs = NULL;		// All environments
 struct Env *curenv = NULL;	        // The current env
 static struct Env_list env_free_list;	// Free list
+uint32_t global_tickets;         // The sum of tickets
 
 #define ENVGENSHIFT	12		// >= LOGNENV
 extern void *memcpy(void *,void*,size_t);
@@ -82,6 +83,9 @@ env_init(void)
 		envs[i].env_id = 0;			
 		LIST_INSERT_HEAD(&env_free_list,&envs[i],env_link);
 	}
+
+	//initialize the global_tickets
+	global_tickets = 0;
 	//cprintf("env init finished\n");
 }
 
@@ -167,12 +171,14 @@ env_alloc(struct Env **newenv_store, envid_t parent_id)
 	if (generation <= 0)	// Don't create a negative env_id.
 		generation = 1 << ENVGENSHIFT;
 	e->env_id = generation | (e - envs);
-	//cprintf("generate env_id:%08x\n",e->env_id);
 	
 	// Set the basic status variables.
 	e->env_parent_id = parent_id;
 	e->env_status = ENV_RUNNABLE;
 	e->env_runs = 0;
+	//initialize the ticket of the env
+	e->tickets = INIT_TICKET;
+	global_tickets += e->tickets;
 
 	// Clear out all the saved register state,
 	// to prevent the register values
@@ -404,6 +410,8 @@ env_free(struct Env *e)
 	pa = e->env_cr3;
 	e->env_pgdir = 0;
 	e->env_cr3 = 0;
+	
+
 	page_decref(pa2page(pa));
 	
 
@@ -421,7 +429,9 @@ void
 env_destroy(struct Env *e) 
 {
 	env_free(e);
-
+	//after free the env, clean the tickets of the env
+	global_tickets -= e->tickets;
+	e->tickets = 0;
 	if (curenv == e) {
 		curenv = NULL;
 		sched_yield();
