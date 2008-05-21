@@ -4,8 +4,19 @@
 #include <kern/pmap.h>
 #include <kern/monitor.h>
 
+//initialization of seed
+uint32_t seed = 1;
+
+
+//Park-Miller psudo random number generator
+uint32_t
+fast_random(uint32_t seed)
+{
+	return ((long unsigned)seed * 279470273UL) % 4294967291UL;
+}
 
 // Choose a user environment to run and run it.
+// Using lottery scheduling
 void
 sched_yield(void)
 {
@@ -22,22 +33,52 @@ sched_yield(void)
 	//cprintf("begin sched yield,curenv:%08x,&envs[0]:%08x\n",curenv,&envs[0]);
 	
 	uint32_t i;
-	uint32_t start = curenv ? (ENVX(curenv->env_id) + 1)%NENV : 0;
-
-	for(i = 0; i < NENV;i++)
+	int winning = 1 ;
+	if(global_tickets != 0)
 	{
-		uint32_t index = (start + i)%NENV;
-		if(index == 0)
-		       	continue;
-		else if(envs[index].env_status == ENV_RUNNABLE)
+		//generate the random winning number
+		//always remember to change the seed
+		//the quality of the random winning 
+		//is the most critical part of lottery scheduling
+		while(winning < 8)
 		{
-			//cprintf("env_run:run envs[%08x]\n",index);
-			//cprintf("env_tf:%08x\n",envs[index].env_tf);
-			env_run(&envs[index]);
-			return;
+			winning = fast_random(seed)% global_tickets;
+			seed++;
+
 		}
-			
-	}	
+	}
+	else
+		cprintf("global ticket = 0\n");
+	if(envs[0].env_status == ENV_RUNNABLE)
+		winning -= envs[0].tickets;
+	for( i = 1; i < NENV; i++)
+	{
+		//only runnable env has tickets
+		if(envs[i].env_status == ENV_RUNNABLE)
+		{
+			winning -= envs[i].tickets;
+			if(winning < 0)
+			{
+				//adjust the tickets dynamically according to
+				//the running of the envs
+				if(envs[i].tickets != 1)
+				{
+					envs[i].tickets /= 2;
+					global_tickets -= envs[i].tickets;
+				}
+				else
+				{
+					envs[i].tickets = INIT_TICKET;
+					global_tickets += (INIT_TICKET - 1);
+				}
+				
+					env_run(&envs[i]);
+					return;
+				}
+			}
+
+		}
+	
 	// Run the special idle environment when nothing else is runnable.
 	if (envs[0].env_status == ENV_RUNNABLE)
 		env_run(&envs[0]);

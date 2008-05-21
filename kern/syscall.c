@@ -12,6 +12,10 @@
 #include <kern/console.h>
 #include <kern/sched.h>
 
+
+//every env's tickets related to switch of status should be changed
+//system call is the only part which will deal with the env's status change  	
+
 // Print a string to the system console.
 // The string is exactly 'len' characters long.
 // Destroys the environment on memory errors.
@@ -94,7 +98,14 @@ sys_exofork(void)
 	else
 	{
 		//cprintf("curenv id:%08x\n",curenv->env_id);
+		if(child->env_status == ENV_RUNNABLE)
+		{
+			global_tickets -= child->tickets;
+			child->tickets = 0;
+		}
 		child->env_status = ENV_NOT_RUNNABLE;
+
+
 		child->env_tf = curenv->env_tf;
 		child->env_pgfault_upcall = curenv->env_pgfault_upcall;
 		//	cprintf("curenv->env_tf:%08x\n",curenv->env_tf);
@@ -123,17 +134,32 @@ sys_env_set_status(envid_t envid, int status)
 	// envid's status.
 	
 	// LAB 4: Your code here.
+
 	struct Env * env; 
 	if(envid2env(envid, &env, 1) == -E_BAD_ENV)
 		return -E_BAD_ENV;
-	else if(status != ENV_RUNNABLE && status != ENV_NOT_RUNNABLE)
+	if(status != ENV_RUNNABLE && status != ENV_NOT_RUNNABLE)
 	{
 		//cprintf("status:%08x\n",status);
 		return -E_INVAL;
 	}
 	else
 	{
-		//cprintf("env id:%08x\n",env->env_id);
+
+
+		if(status == ENV_RUNNABLE && env->env_status != ENV_RUNNABLE)
+		{
+			env->tickets = INIT_TICKET;
+			global_tickets += env->tickets;
+
+
+		}
+		else if(status != ENV_RUNNABLE && env->env_status == ENV_RUNNABLE)
+		{
+			global_tickets -= env->tickets;
+			env->tickets = 0;
+		}
+		
 		env -> env_status = status;
 		return 0;
 	}
@@ -395,6 +421,11 @@ sys_ipc_try_send(envid_t envid, uint32_t value, void *srcva, unsigned perm)
 		if(srcva == 0 ||env->env_ipc_dstva == 0)
 		{
 			env->env_ipc_perm = 0;
+			if(env->env_status != ENV_RUNNABLE)
+			{
+				env->tickets = INIT_TICKET;
+				global_tickets += env->tickets;
+			}
 			env->env_status = ENV_RUNNABLE;
 			return 0;
 		}
@@ -407,6 +438,11 @@ sys_ipc_try_send(envid_t envid, uint32_t value, void *srcva, unsigned perm)
 	        		return ret;
 			if(ret == 0)
 			{
+				if(env->env_status != ENV_RUNNABLE)
+				{
+					env->tickets = INIT_TICKET;
+					global_tickets += env->tickets;
+				}
 				env->env_status = ENV_RUNNABLE;				
 				return 1;
 			}
@@ -442,11 +478,12 @@ sys_ipc_recv(void *dstva)
 		else
 			return -E_INVAL;
 	}
+	if(curenv-> env_status == ENV_RUNNABLE)
+	{
+		global_tickets -= curenv->tickets;
+		curenv->tickets = 0;
+	}
 	curenv->env_status = ENV_NOT_RUNNABLE;
-	//if(sys_env_set_status(0,ENV_NOT_RUNNABLE) != 0)
-	//	panic("set status error");
-	//sched_yield();
-	//panic("sys_ipc_recv not implemented");
 	return 0;
 }
 
