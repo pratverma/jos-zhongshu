@@ -73,10 +73,7 @@ duppage(envid_t envid, unsigned pn)
 	pte_t pte;
 	uint32_t perm = 0;
 	addr = (void*)(pn*PGSIZE);
-	//if(addr == (void*)0x00803000)
-	//	cprintf("addr:%08x\n",addr);
 	struct Env *env;
-	//envid2env(sys_getenvid(),&env,1);
 	// LAB 4: Your code here.
 	pte = vpt[pn];
 	
@@ -172,22 +169,12 @@ fork(void)
 			}
 		}
 	}
-    
-	//cprintf("map the page finished\n");
 	
-	if((r = sys_page_alloc(envid, (void*)(UXSTACKTOP-PGSIZE), PTE_U|PTE_P|PTE_W)) < 0)
-			return r;
-	//cprintf("fork:envid:%08x,_pgfault_upcall:%08x\n",envid,_pgfault_upcall);	
-	if ((r = sys_env_set_pgfault_upcall(envid, _pgfault_upcall)) < 0)
-		panic("set_pgfault_handler: set pgfault upcall error: %e", r);
-	//if((r = sys_page_map(0,_pgfault_upcall,envid,_pgfault_upcall,PTE_U|PTE_P)) < 0)
-	//	panic("page map _pgfault_upcall failed %e",r);
-
-
-
-	if ((r = sys_env_set_status(envid, ENV_RUNNABLE)) < 0)
-		panic("sys_env_set_status: %e", r);
-	//cprintf("return envid:%08x\n",envid);
+	//use sys_for_fork to substitue a batch of syscalls
+	//e.g sys_page_alloc sys_env_set_pgfault_upcall and SYS_env_set_status
+   	if((r = sys_for_fork(envid, (void*)(UXSTACKTOP-PGSIZE), 
+					PTE_U|PTE_P|PTE_W, _pgfault_upcall,ENV_RUNNABLE) < 0))
+		panic("sys_for_fork error: %e", r);
 	return envid;
 
 }

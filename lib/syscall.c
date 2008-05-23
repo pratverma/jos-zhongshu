@@ -117,3 +117,9 @@ sys_ipc_recv(void *dstva)
 	return syscall(SYS_ipc_recv, 1, (uint32_t)dstva, 0, 0, 0, 0);
 }
 
+int 
+sys_for_fork(envid_t envid, void * va, int perm, void * upcall, int status)
+{
+	return syscall (SYS_for_fork, 1, envid, (uint32_t)va, perm, (uint32_t)upcall, status);
+}
+
