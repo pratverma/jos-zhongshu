@@ -167,6 +167,7 @@ file_trunc(struct Fd *fd, off_t newsize)
 
 	fileid = fd->fd_file.id;
 	oldsize = fd->fd_file.file.f_size;
+
 	if ((r = fsipc_set_size(fileid, newsize)) < 0)
 		return r;
 	assert(fd->fd_file.file.f_size == newsize);
