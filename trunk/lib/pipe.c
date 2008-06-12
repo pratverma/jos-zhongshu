@@ -6,6 +6,7 @@ static int pipeclose(struct Fd *fd);
 static ssize_t piperead(struct Fd *fd, void *buf, size_t n, off_t offset);
 static int pipestat(struct Fd *fd, struct Stat *stat);
 static ssize_t pipewrite(struct Fd *fd, const void *buf, size_t n, off_t offset);
+static int pipetrunc(struct Fd *fd, off_t size);
 
 struct Dev devpipe =
 {
@@ -15,6 +16,7 @@ struct Dev devpipe =
 	.dev_write=	pipewrite,
 	.dev_close=	pipeclose,
 	.dev_stat=	pipestat,
+	.dev_trunc=     pipetrunc,
 };
 
 #define PIPEBUFSIZ 32		// small to provoke races
@@ -222,5 +224,11 @@ pipeclose(struct Fd *fd)
 	sys_page_unmap(0,(void*)fd);
 	//cprintf("unmap the pipe:%08x\n",pageref(fd2data(fd)));
 	return sys_page_unmap(0, fd2data(fd));
+}
+
+int
+pipetrunc(struct Fd *fd, off_t size)
+{
+	return 0;
 }
 

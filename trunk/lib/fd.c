@@ -267,6 +267,7 @@ write(int fdnum, const void *buf, size_t n)
 	if (debug)
 		cprintf("write %d %s %d via dev %s\n",
 			fdnum, buf, n, dev->dev_name);
+	//cprintf("fd->fd_offset:%08x\n",fd->fd_offset);
 	r = (*dev->dev_write)(fd, buf, n, fd->fd_offset);
 	if (r > 0)
 		fd->fd_offset += r;
@@ -299,6 +300,9 @@ ftruncate(int fdnum, off_t newsize)
 			env->env_id, fdnum); 
 		return -E_INVAL;
 	}
+	if (debug)
+		cprintf("truncate %d via dev %s\n",
+			fdnum, dev->dev_name);
 	return (*dev->dev_trunc)(fd, newsize);
 }
 

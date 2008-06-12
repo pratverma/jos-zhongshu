@@ -12,7 +12,7 @@
 #endif
 
 //The initial ticket assigned to one specific env
-#define INIT_TICKET (1<<10)
+#define INIT_TICKET (1<<3)
 
 extern struct Env *envs;		// All environments
 extern struct Env *curenv;	        // Current environment

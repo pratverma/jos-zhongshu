@@ -19,7 +19,6 @@ void
 umain(int argc, char **argv)
 {
 	int f, i;
-
 	argv0 = "cat";
 	if (argc == 1)
 		cat(0, "<stdin>");

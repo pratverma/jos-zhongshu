@@ -38,6 +38,7 @@ static ssize_t cons_read(struct Fd*, void*, size_t, off_t);
 static ssize_t cons_write(struct Fd*, const void*, size_t, off_t);
 static int cons_close(struct Fd*);
 static int cons_stat(struct Fd*, struct Stat*);
+static int cons_trunc(struct Fd *fd, off_t);
 
 struct Dev devcons =
 {
@@ -46,7 +47,8 @@ struct Dev devcons =
 	.dev_read =	cons_read,
 	.dev_write =	cons_write,
 	.dev_close =	cons_close,
-	.dev_stat =	cons_stat
+	.dev_stat =	cons_stat,
+	.dev_trunc =    cons_trunc
 };
 
 int
@@ -129,4 +131,11 @@ cons_stat(struct Fd *fd, struct Stat *stat)
 	strcpy(stat->st_name, "<cons>");
 	return 0;
 }
+
+int
+cons_trunc(struct Fd *fd, off_t newsize)
+{
+	return 0;
+}
+
 

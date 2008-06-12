@@ -40,10 +40,14 @@ sched_yield(void)
 		//always remember to change the seed
 		//the quality of the random winning 
 		//is the most critical part of lottery scheduling
-		while(winning < 8)
+		while(winning < INIT_TICKET)
 		{
+
 			winning = fast_random(seed)% global_tickets;
+			//cprintf("winning %08x,seed:%08x\n",winning,seed);
 			seed++;
+			if(seed > 10000)
+				seed = 0;
 
 		}
 	}
@@ -74,10 +78,10 @@ sched_yield(void)
 				
 					env_run(&envs[i]);
 					return;
-				}
 			}
-
 		}
+
+	}
 	
 	// Run the special idle environment when nothing else is runnable.
 	if (envs[0].env_status == ENV_RUNNABLE)

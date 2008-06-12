@@ -88,6 +88,7 @@ again:
 				cprintf("can not write into %s\n",t);
 				exit();
 			}
+
 			if(fd != 1)
 		    		dup(fd, 1);
 			close(fd);

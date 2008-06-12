@@ -51,8 +51,6 @@ block_is_dirty(uint32_t blockno)
 int
 map_block(uint32_t blockno)
 {
-	if (block_is_mapped(blockno))
-		return 1;
 	return sys_page_alloc(0, diskaddr(blockno), PTE_U|PTE_P|PTE_W|PTE_SHARE);
 }
 
@@ -79,15 +77,14 @@ read_block(uint32_t blockno, char **blk)
 	 * Remember if blockno has already been mapped, we should NOT read it again from disk
 	 * Otherwise, it will ruin the file that has not been written back to the disk
 	 */
-	if((r = map_block(blockno)) < 0)
-		panic("mapping block failed %e\n", r);
-	else if(r == 1)
+	if(block_is_mapped(blockno))
 	{
 		if(blk != 0)
 			*blk = diskaddr(blockno);
 		return 0;
 	}
-
+	if((r = map_block(blockno)) < 0)
+		panic("mapping block failed %e\n", r);
 	addr = diskaddr(blockno);
 	if((r = ide_read(blockno*BLKSIZE/SECTSIZE, addr, BLKSIZE/SECTSIZE)) < 0)
 		panic("ide read error %e\n",r);
@@ -104,17 +101,13 @@ read_block(uint32_t blockno, char **blk)
 void
 write_block(uint32_t blockno)
 {
-	char *addr;
-
 	if (!block_is_mapped(blockno))
 		panic("write unmapped block %08x", blockno);
-	addr = diskaddr(blockno);
-	//write to disk only if this blockno is dirty, otherwise just do nothing
-	if((vpt[VPN(addr)] & PTE_D))
+	if(block_is_dirty(blockno))
 	{	
 		if(ide_write(blockno*BLKSIZE/SECTSIZE, diskaddr(blockno), BLKSIZE/SECTSIZE))
 			panic("ide write failed %08x\n", blockno);
-		sys_page_map(0,diskaddr(blockno),0,diskaddr(blockno),PTE_USER & ~PTE_D);
+		sys_page_map(0,diskaddr(blockno),0,diskaddr(blockno),PTE_USER);
 	}	
 	// Write the disk block and clear PTE_D.
 	// LAB 5: Your code here.
