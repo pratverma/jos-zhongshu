@@ -196,7 +196,7 @@ dup(int oldfdnum, int newfdnum)
 	if (vpd[PDX(ova)]) {
 		for (i = 0; i < PTSIZE; i += PGSIZE) {
 			pte = vpt[VPN(ova + i)];
-			if (pte&PTE_P) {
+			if (pte & PTE_P) {
 				// should be no error here -- pd is already allocated
 				if ((r = sys_page_map(0, ova + i, 0, nva + i, pte & PTE_USER)) < 0)
 					goto err;
