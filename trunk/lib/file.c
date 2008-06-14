@@ -136,8 +136,10 @@ file_write(struct Fd *fd, const void *buf, size_t n, off_t offset)
 
 	// increase the file's size if necessary
 	// No matter whether tot's size is bigger or not
-	if ((r = file_trunc(fd, tot)) < 0)
-		return r;
+	if (tot > fd->fd_file.file.f_size) {
+		if ((r = file_trunc(fd, tot)) < 0)
+			return r;
+	}
 
 	// write the data
 	memmove(fd2data(fd) + offset, buf, n);

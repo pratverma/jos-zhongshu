@@ -1,23 +1,2 @@
-6828 decimal is 15254 octal!
-Physical memory: 32768K available, base = 640K, extended = 31744K
-check_page_alloc() succeeded!
-page_check() succeeded!
-check_boot_pgdir() succeeded!
-enabled interrupts: 1 2 4
-	     Setup timer interrupts via 8259A
-enabled interrupts: 0 1 2 4
-	     unmasked timer interrupt
-FS is running
-FS can do I/O
-Device 1 presence: 1
-superblock is good
-write_block is good
-read_bitmap is good
-alloc_block is good
-file_open is good
-file_get_block is good
-file_flush is good
-file_truncate is good
-file rewrite is good
-running sh -x < testshell.sh > testshell.out
-shell ran correctly
+00000896125e[HD   ] ata1: device set to 1 which does not exist
+00301040000p[XGUI ] >>PANIC<< POWER button turned off.
