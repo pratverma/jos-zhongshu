@@ -88,6 +88,8 @@ again:
 				cprintf("can not write into %s\n",t);
 				exit();
 			}
+			//truncate the file in order to make it write to a empty file
+			ftruncate(fd, 0);
 
 			if(fd != 1)
 		    		dup(fd, 1);
