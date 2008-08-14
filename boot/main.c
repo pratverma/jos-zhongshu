@@ -55,6 +55,9 @@ bootmain(void)
 
 	// call the entry point from the ELF header
 	// note: does not return!
+	// Pay attention to "and 0xFFFFFF"
+	// it will function like -KERNBASE of the link address
+	// gdt at now is the bootstrap gdt which will not -KERNBASE
 	((void (*)(void)) (ELFHDR->e_entry & 0xFFFFFF))();
 
 bad:
@@ -71,6 +74,9 @@ readseg(uint32_t va, uint32_t count, uint32_t offset)
 {
 	uint32_t end_va;
 
+	// The same function of reset the address!!!!!!!
+	// The kernel will be read into 0x10000c(load address) 
+	// NOT 0xf010000c(link address)
 	va &= 0xFFFFFF;
 	end_va = va + count;
 	
