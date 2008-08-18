@@ -36,18 +36,23 @@ struct Segdesc gdt[] =
 	SEG_NULL,
 
 	// 0x8 - kernel code segment
+	// 0x8 >> 3 = 0x1
 	[GD_KT >> 3] = SEG(STA_X | STA_R, 0x0, 0xffffffff, 0),
 
 	// 0x10 - kernel data segment
+	// 0x10 >> 3 = 0x2
 	[GD_KD >> 3] = SEG(STA_W, 0x0, 0xffffffff, 0),
 
 	// 0x18 - user code segment
+	// 0x18 >> 3 = 0x3
 	[GD_UT >> 3] = SEG(STA_X | STA_R, 0x0, 0xffffffff, 3),
 
 	// 0x20 - user data segment
+	// 0x20 >> 3 = 0x4
 	[GD_UD >> 3] = SEG(STA_W, 0x0, 0xffffffff, 3),
 
 	// 0x28 - tss, initialized in idt_init()
+	// 0x28 >> 3 = 0x5
 	[GD_TSS >> 3] = SEG_NULL
 };
 
@@ -58,6 +63,9 @@ struct Pseudodesc gdt_pd = {
 static int
 nvram_read(int r)
 {
+	//read the lower byte
+	//and then the high byte
+	//merge them together 
 	return mc146818_read(r) | (mc146818_read(r + 1) << 8);
 }
 
@@ -65,7 +73,10 @@ void
 i386_detect_memory(void)
 {
 	// CMOS tells us how many kilobytes there are
+	
+	//0x15 0x16 from cmos memory for base memory 
 	basemem = ROUNDDOWN(nvram_read(NVRAM_BASELO)*1024, PGSIZE);
+	//0x17 0x18 from cmos memory for extent memory
 	extmem = ROUNDDOWN(nvram_read(NVRAM_EXTLO)*1024, PGSIZE);
 
 	// Calculate the maximum physical address based on whether

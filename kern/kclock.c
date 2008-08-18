@@ -17,6 +17,13 @@
 unsigned
 mc146818_read(unsigned reg)
 {
+	/*
+	 * The CMOS memory exists outside of the normal address space and cannot contain directly executable code. 
+	 * The CMOS is not addressed from the address bus. 
+	 * It is reachable through the machine code IN and OUT commands at port number 70h and 71h . 
+	 * To read a CMOS byte, an OUT to port 70h is executed with the address of the byte to be read 
+	 * and an IN from port 71h will then retrieve the requested information.
+	 */
 	outb(IO_RTC, reg);
 	return inb(IO_RTC+1);
 }
