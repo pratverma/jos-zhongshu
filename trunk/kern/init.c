@@ -17,11 +17,24 @@
 void
 i386_init(void)
 {
-	extern char edata[], end[];
+	extern char etext[],edata[], end[];
 
 	// Before doing anything else, complete the ELF loading process.
 	// Clear the uninitialized global data (BSS) section of our program.
 	// This ensures that all static/global variables start out zero.
+	
+	/* 
+	 * From http://en.wikipedia.org/wiki/.bss
+	 * In computer programming
+	 * .bss or bss (Block Started by Symbol) is used by many compilers and linkers 
+	 * as the name of the data segment containing static variables 
+	 * that are filled solely with zero-valued data initially 
+	 * (i. e., when execution begins). 
+	 * It is often referred to as the "bss section" or "bss segment". 
+	 * The program loader initializes the memory allocated for the bss section 
+	 * when it loads the program.
+	 */
+	
 	memset(edata, 0, end - edata);
 
 	// Initialize the console.
@@ -29,6 +42,7 @@ i386_init(void)
 	cons_init();
 
 	cprintf("6828 decimal is %o octal!\n", 6828);
+	cprintf("etext:%08x,edata:%08x,end:%08x\n",etext,edata,end);
 
 	// Lab 2 memory management initialization functions
 	i386_detect_memory();

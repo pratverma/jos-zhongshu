@@ -72,7 +72,7 @@ nvram_read(int r)
 void
 i386_detect_memory(void)
 {
-	// CMOS tells us how many kilobytes there are
+	// CMOS tells us how many bytes there are
 	
 	//0x15 0x16 from cmos memory for base memory 
 	basemem = ROUNDDOWN(nvram_read(NVRAM_BASELO)*1024, PGSIZE);

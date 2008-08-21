@@ -79,6 +79,9 @@ gdt:
   SEG(STA_X|STA_R, 0x0, 0xffffffff)	# code seg
   SEG(STA_W, 0x0, 0xffffffff)	        # data seg
 
+# The GDTR is 48 bits long.
+# The lower 16 bits tell the size of the GDT
+# The upper 32 bits tell the location of the GDT in memory.
 gdtdesc:
   .word   0x17                            # sizeof(gdt) - 1
   .long   gdt                             # address gdt
