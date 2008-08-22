@@ -64,12 +64,15 @@ void	tlb_invalidate(pde_t *pgdir, void *va);
 int	user_mem_check(struct Env *env, const void *va, size_t len, int perm);
 void	user_mem_assert(struct Env *env, const void *va, size_t len, int perm);
 
+
+//transfer from page to page's number
 static inline ppn_t
 page2ppn(struct Page *pp)
 {
 	return pp - pages;
 }
 
+//If you know the position of the page in the memory, you can know its physical address 
 static inline physaddr_t
 page2pa(struct Page *pp)
 {
