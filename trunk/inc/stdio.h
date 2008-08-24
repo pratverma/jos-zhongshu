@@ -29,5 +29,7 @@ int	vfprintf(int fd, const char *fmt, va_list);
 
 // lib/readline.c
 char*	readline(const char *prompt);
+char*	secretreadline(const char *prompt);
+
 
 #endif /* !JOS_INC_STDIO_H */

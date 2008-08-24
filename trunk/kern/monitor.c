@@ -14,6 +14,17 @@
 
 #define CMDBUF_SIZE	80	// enough for one VGA text line
 
+struct Username_Password {
+	const char * username;
+	const char * password;
+};
+
+static struct Username_Password username_passwords[] = {
+	{"root","stevengu" },
+};
+
+#define NUSER (sizeof(username_passwords)/sizeof(username_passwords[0]))
+
 
 struct Command {
 	const char *name;
@@ -159,4 +170,33 @@ read_eip()
 	uint32_t callerpc;
 	__asm __volatile("movl 4(%%ebp), %0" : "=r" (callerpc));
 	return callerpc;
+}
+
+int 
+login()
+{
+	char *username,*password;
+	int i;
+	username = readline("username:");
+	for(i = 0; i < NUSER; i++)
+	{
+		if(!strcmp(username, username_passwords[i].username))
+		{
+			password = secretreadline("password:");
+			if(!strcmp(password, username_passwords[i].password))
+			{
+				cprintf("\n");
+				return 0;
+			}
+			else 
+			{
+				cprintf("\nwrong password!\n");
+				return -1;
+			}
+		}
+	}
+	cprintf("No such username\n");
+	return -1;
+
+
 }
