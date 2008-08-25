@@ -184,10 +184,13 @@ cga_putc(int c)
 	// we need to cut the first line of the screen and scroll one line  
 	if (crt_pos >= CRT_SIZE) {
 		int i;
-
+		//copy the entire crt_buf to a higher position
 		memmove(crt_buf, crt_buf + CRT_COLS, (CRT_SIZE - CRT_COLS) * sizeof(uint16_t));
+		//clear current line
+		//otherwise the current line will be positioned with duplicate last line
 		for (i = CRT_SIZE - CRT_COLS; i < CRT_SIZE; i++)
 			crt_buf[i] = 0x0700 | ' ';
+		//reset the current position
 		crt_pos -= CRT_COLS;
 	}
 
