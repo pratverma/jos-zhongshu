@@ -40,8 +40,7 @@ i386_init(void)
 	// Initialize the console.
 	// Can't call cprintf until after we do this!
 	cons_init();
-	while(login() != 0)
-		continue;
+
 
 	cprintf("6828 decimal is %o octal!\n", 6828);
 	cprintf("etext:%08x,edata:%08x,end:%08x\n",etext,edata,end);
@@ -76,7 +75,8 @@ i386_init(void)
 	// Should not be necessary - drain keyboard because interrupt has given up.
 	kbd_intr();
 
-
+	while(login() != 0)
+		continue;
 	// Schedule and run the first user environment!
 	sched_yield();
 
