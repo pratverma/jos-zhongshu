@@ -20,7 +20,8 @@ ipc_recv(envid_t *from_env_store, void *pg, int *perm_store)
 	// LAB 4: Your code here.
 	if(pg == 0)
 	{
-		if(sys_ipc_recv(0) != 0)
+		//address above UTOP will be regarded as no page
+		if(sys_ipc_recv((void*)UTOP) != 0)
 			panic("ipc recv error");
 	}
 	else 
@@ -52,7 +53,7 @@ ipc_send(envid_t to_env, uint32_t val, void *pg, int perm)
 	int ret;
 	void * srcva;
 	if(pg == 0)
-		srcva = 0;
+		srcva = (void*)UTOP;
 	else
 		srcva = pg;
 	while(1)
@@ -75,6 +76,11 @@ ipc_send(envid_t to_env, uint32_t val, void *pg, int perm)
 			//cprintf("ipc not recv\n");
 			sys_yield();
 			continue;
+		}
+		else if(ret == -E_BAD_ENV)
+		{
+			exit();
+			break;
 		}
 		else
 			panic("error occur in ipc send:%e",ret);

@@ -76,8 +76,8 @@ sched_yield(void)
 					global_tickets += (INIT_TICKET - 1);
 				}
 				
-					env_run(&envs[i]);
-					return;
+				env_run(&envs[i]);
+				return;
 			}
 		}
 

@@ -471,7 +471,7 @@ sys_ipc_recv(void *dstva)
 		panic("ipc recv:no such envid");
 	curenv->env_ipc_recving = 1;
 	curenv->env_ipc_dstva = 0;
-	if((uint32_t)dstva != 0 && (uint32_t)dstva < UTOP)
+	if((uint32_t)dstva < UTOP)
 	{
 		if(((uint32_t)dstva % PGSIZE) == 0)
 			curenv->env_ipc_dstva = dstva;
@@ -502,6 +502,15 @@ sys_for_fork(envid_t envid, void * va, int perm, void * func, int status)
 	if ((r = sys_env_set_status(envid, status)) < 0)
 		return r;
 	return 0;
+}
+
+static int
+sys_set_shforkid(envid_t envid)
+{
+	shforkid = envid;
+	//cprintf("sys set shell fork id %08x\n",shforkid);
+	return 0;
+
 }
 
 // Dispatches to the correct kernel function, passing the arguments.
@@ -561,7 +570,11 @@ syscall(uint32_t syscallno, uint32_t a1, uint32_t a2, uint32_t a3, uint32_t a4, 
 			break;
 		case SYS_for_fork:
 			result = sys_for_fork((envid_t)a1, (void *)a2, (int)a3,(void *)a4, (int)a5);
-			break;			
+			break;
+		case SYS_set_shforkid:
+			result = sys_set_shforkid((envid_t)a1);
+			break;	
+			
 		default:
 			result = -E_INVAL;
 	}

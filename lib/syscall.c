@@ -123,3 +123,8 @@ sys_for_fork(envid_t envid, void * va, int perm, void * upcall, int status)
 	return syscall (SYS_for_fork, 1, envid, (uint32_t)va, perm, (uint32_t)upcall, status);
 }
 
+int 
+sys_set_shforkid(envid_t envid)
+{
+	return syscall (SYS_set_shforkid,1 , envid,0,0,0,0);
+}

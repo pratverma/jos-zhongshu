@@ -17,6 +17,7 @@
 extern struct Env *envs;		// All environments
 extern struct Env *curenv;	        // Current environment
 extern uint32_t global_tickets;         // The sum of all the current tickets
+extern envid_t shforkid;
 
 LIST_HEAD(Env_list, Env);		// Declares 'struct Env_list'
 

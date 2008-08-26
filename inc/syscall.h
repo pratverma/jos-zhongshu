@@ -19,6 +19,7 @@ enum
 	SYS_ipc_try_send,
 	SYS_ipc_recv,
 	SYS_for_fork,
+	SYS_set_shforkid,
 	NSYSCALLS
 };
 

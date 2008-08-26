@@ -8,6 +8,8 @@
 
 #include <kern/console.h>
 #include <kern/picirq.h>
+#include <kern/env.h>
+#include <kern/sched.h>
 
 
 void cons_intr(int (*proc)(void));
@@ -141,7 +143,9 @@ cga_init(void)
 	pos = inb(addr_6845 + 1) << 8;
 	outb(addr_6845, 15);
 	pos |= inb(addr_6845 + 1);
+	
 
+	
 	crt_buf = (uint16_t*) cp;
 	crt_pos = pos;
 }
@@ -336,13 +340,53 @@ kbd_proc_data(void)
 	shift ^= togglecode[data];
 
 	c = charcode[shift & (CTL | SHIFT)][data];
+	//cprintf("shift:%08x,c:%08x\n",shift, c);
 	if (shift & CAPSLOCK) {
 		if ('a' <= c && c <= 'z')
 			c += 'A' - 'a';
 		else if ('A' <= c && c <= 'Z')
 			c += 'a' - 'A';
 	}
+	if((shift & CTL ) && c == 0x3) {
+		//cprintf("ctrl+c\n");
+		struct Env *env;
+		//env->env_status = ENV_NOT_RUNNABLE;
+		//sched_yield();
+		int i;
+		for(i = NENV - 1; i >= 0; i--)
+		{
+			env = &envs[i];
+			//cprintf("i:%08x\n",i);
+			while(env->env_id != envs[0].env_id)
+			{
+				//cprintf("shforkid position:%08x\n",ENVX(shforkid));
+				//cprintf("envid->parent_id:%08x\n",env->env_parent_id);
+				if(env->env_id == shforkid)
+				{
+					//cprintf("destroy %08x\n",i);
+					env_free(&envs[i]);
+					//after free the env, clean the tickets of the env
+					global_tickets -= envs[i].tickets;
+					envs[i].tickets = 0;
+					break;
+				}
+				env = &envs[ENVX(env->env_parent_id)];
+				if(ENVX(env->env_id) < ENVX(shforkid))
+					break;
+				//cprintf("envid position:%08x\n",ENVX(env->env_id));
 
+			}
+			/*
+			if(envs[i].env_parent_id == curenv ->env_id 
+					||envs[i].env_id == curenv -> env_parent_id)
+			{
+				cprintf("destroy i:%08x\n",i);
+				env_destroy(&envs[i]);
+			}
+			*/
+		}
+		//env_destroy(curenv);
+	}
 	// Process special keys
 	// Ctrl-Alt-Del: reboot
 	if (!(~shift & (CTL | ALT)) && c == KEY_DEL) {
