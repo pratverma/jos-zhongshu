@@ -16,11 +16,14 @@ forkchild(const char *cur, char branch)
 		return;
 
 	snprintf(nxt, DEPTH+1, "%s%c", cur, branch);
+	envid_t r;
 
-	if (fork() == 0) {
+	if ((r = fork()) == 0) {
 		forktree(nxt);
 		exit();
 	}
+	else
+		wait(r);
 }
 
 void

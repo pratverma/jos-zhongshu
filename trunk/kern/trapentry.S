@@ -113,13 +113,13 @@ _alltraps:
     //We should push into the stack to finish the trapframe
     //Some fields have already been set by x86 hardware
     //We just need to manually add these fields left
-    //And don't remember to pop what we pushed after the call
+    //And don't forget to pop what we pushed after the call
     //iret will automatically pop the other fields left 
     pushl %ds;
     pushl %es;
     pushal;
     cli;
-    /*
+    /*cli's function is like below
      *pushfl;
      *popl %eax;
      *movl $FL_IF,%ebx;

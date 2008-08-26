@@ -77,11 +77,6 @@ ipc_send(envid_t to_env, uint32_t val, void *pg, int perm)
 			sys_yield();
 			continue;
 		}
-		else if(ret == -E_BAD_ENV)
-		{
-			exit();
-			break;
-		}
 		else
 			panic("error occur in ipc send:%e",ret);
 	}
