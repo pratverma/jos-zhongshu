@@ -17,6 +17,7 @@ struct Env *envs = NULL;		// All environments
 struct Env *curenv = NULL;	        // The current env
 static struct Env_list env_free_list;	// Free list
 uint32_t global_tickets;         // The sum of tickets
+envid_t shforkid;
 
 #define ENVGENSHIFT	12		// >= LOGNENV
 extern void *memcpy(void *,void*,size_t);
@@ -429,13 +430,16 @@ void
 env_destroy(struct Env *e) 
 {
 	env_free(e);
+
 	//after free the env, clean the tickets of the env
 	global_tickets -= e->tickets;
 	e->tickets = 0;
-	if (curenv == e) {
-		curenv = NULL;
+	if (curenv == e)
+	{
+		curenv = NULL;	
 		sched_yield();
 	}
+	
 }
 
 

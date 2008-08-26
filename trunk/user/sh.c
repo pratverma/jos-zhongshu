@@ -359,8 +359,10 @@ umain(int argc, char **argv)
 			runcmd(buf);
 			exit();
 		} else
-			//cprintf("wait\n");
+		{
+			sys_set_shforkid(r);
 			wait(r);
+		}
 	}
 }
 
