@@ -173,7 +173,7 @@ fork(void)
 	//use sys_for_fork to substitue a batch of syscalls
 	//e.g sys_page_alloc sys_env_set_pgfault_upcall and SYS_env_set_status
    	if((r = sys_for_fork(envid, (void*)(UXSTACKTOP-PGSIZE), 
-					PTE_U|PTE_P|PTE_W,ENV_RUNNABLE) < 0))
+					PTE_U|PTE_P|PTE_W, _pgfault_upcall,ENV_RUNNABLE) < 0))
 		panic("sys_for_fork error: %e", r);
 	return envid;
 
