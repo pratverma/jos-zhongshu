@@ -4,7 +4,7 @@
 !_TAG_PROGRAM_NAME	Exuberant Ctags	//
 !_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
 !_TAG_PROGRAM_VERSION	5.6	//
-ALT	kern/console.c	208;"	d	file:
+ALT	kern/console.c	215;"	d	file:
 ARGBEGIN	inc/args.h	79;"	d
 ARGC	inc/args.h	98;"	d
 ARGEND	inc/args.h	92;"	d
@@ -20,31 +20,31 @@ BLOCK_SUPER	fs/fsformat.c	/^	BLOCK_SUPER,$/;"	e	enum:__anon3	file:
 BUFLEN	lib/readline.c	4;"	d	file:
 BUFSIZ	user/sh.c	3;"	d	file:
 Block	fs/fsformat.c	/^struct Block$/;"	s	file:
-C	kern/console.c	275;"	d	file:
-CAPSLOCK	kern/console.c	210;"	d	file:
+C	kern/console.c	282;"	d	file:
+CAPSLOCK	kern/console.c	217;"	d	file:
 CGA_BASE	kern/console.h	13;"	d
 CGA_BUF	kern/console.h	14;"	d
 CHECKSUM	kern/entry.S	/^#define CHECKSUM (-(MULTIBOOT_HEADER_MAGIC + MULTIBOOT_HEADER_FLAGS))$/;"	d
-CMDBUF_SIZE	kern/monitor.c	15;"	d	file:
+CMDBUF_SIZE	kern/monitor.c	16;"	d	file:
 CMDBYTE	inc/kbdreg.h	60;"	d
-COM1	kern/console.c	18;"	d	file:
-COM_DLL	kern/console.c	21;"	d	file:
-COM_DLM	kern/console.c	22;"	d	file:
-COM_FCR	kern/console.c	26;"	d	file:
-COM_IER	kern/console.c	23;"	d	file:
-COM_IER_RDI	kern/console.c	24;"	d	file:
-COM_IIR	kern/console.c	25;"	d	file:
-COM_LCR	kern/console.c	27;"	d	file:
-COM_LCR_DLAB	kern/console.c	28;"	d	file:
-COM_LCR_WLEN8	kern/console.c	29;"	d	file:
-COM_LSR	kern/console.c	34;"	d	file:
-COM_LSR_DATA	kern/console.c	35;"	d	file:
-COM_MCR	kern/console.c	30;"	d	file:
-COM_MCR_DTR	kern/console.c	32;"	d	file:
-COM_MCR_OUT2	kern/console.c	33;"	d	file:
-COM_MCR_RTS	kern/console.c	31;"	d	file:
-COM_RX	kern/console.c	20;"	d	file:
-CONSBUFSIZE	kern/console.c	374;"	d	file:
+COM1	kern/console.c	20;"	d	file:
+COM_DLL	kern/console.c	23;"	d	file:
+COM_DLM	kern/console.c	24;"	d	file:
+COM_FCR	kern/console.c	28;"	d	file:
+COM_IER	kern/console.c	25;"	d	file:
+COM_IER_RDI	kern/console.c	26;"	d	file:
+COM_IIR	kern/console.c	27;"	d	file:
+COM_LCR	kern/console.c	29;"	d	file:
+COM_LCR_DLAB	kern/console.c	30;"	d	file:
+COM_LCR_WLEN8	kern/console.c	31;"	d	file:
+COM_LSR	kern/console.c	36;"	d	file:
+COM_LSR_DATA	kern/console.c	37;"	d	file:
+COM_MCR	kern/console.c	32;"	d	file:
+COM_MCR_DTR	kern/console.c	34;"	d	file:
+COM_MCR_OUT2	kern/console.c	35;"	d	file:
+COM_MCR_RTS	kern/console.c	33;"	d	file:
+COM_RX	kern/console.c	22;"	d	file:
+CONSBUFSIZE	kern/console.c	421;"	d	file:
 CR0_AM	inc/mmu.h	88;"	d
 CR0_CD	inc/mmu.h	90;"	d
 CR0_EM	inc/mmu.h	83;"	d
@@ -66,13 +66,13 @@ CR4_VME	inc/mmu.h	99;"	d
 CRT_COLS	kern/console.h	17;"	d
 CRT_ROWS	kern/console.h	16;"	d
 CRT_SIZE	kern/console.h	18;"	d
-CTL	kern/console.c	207;"	d	file:
+CTL	kern/console.c	214;"	d	file:
 Command	kern/monitor.c	/^struct Command {$/;"	s	file:
 DEPTH	user/forktree.c	5;"	d	file:
 DISKMAP	fs/fs.h	9;"	d
 DISKSIZE	fs/fs.h	12;"	d
 Dev	inc/fd.h	/^struct Dev {$/;"	s
-E0ESC	kern/console.c	214;"	d	file:
+E0ESC	kern/console.c	221;"	d	file:
 EARGF	inc/args.h	95;"	d
 ELFHDR	boot/main.c	33;"	d	file:
 ELF_MAGIC	inc/elf.h	4;"	d
@@ -85,10 +85,10 @@ ELF_SHT_NULL	inc/elf.h	57;"	d
 ELF_SHT_PROGBITS	inc/elf.h	58;"	d
 ELF_SHT_STRTAB	inc/elf.h	60;"	d
 ELF_SHT_SYMTAB	inc/elf.h	59;"	d
-ENVGENSHIFT	kern/env.c	21;"	d	file:
+ENVGENSHIFT	kern/env.c	22;"	d	file:
 ENVX	inc/env.h	31;"	d
-ENV_CREATE	kern/env.h	40;"	d
-ENV_CREATE2	kern/env.h	35;"	d
+ENV_CREATE	kern/env.h	41;"	d
+ENV_CREATE2	kern/env.h	36;"	d
 ENV_FREE	inc/env.h	34;"	d
 ENV_NOT_RUNNABLE	inc/env.h	36;"	d
 ENV_RUNNABLE	inc/env.h	35;"	d
@@ -355,7 +355,7 @@ LIST_NEXT	inc/queue.h	153;"	d
 LIST_REMOVE	inc/queue.h	212;"	d
 LOG2NENV	inc/env.h	29;"	d
 MAX	inc/types.h	48;"	d
-MAXARGS	kern/monitor.c	93;"	d	file:
+MAXARGS	kern/monitor.c	116;"	d	file:
 MAXARGS	user/sh.c	20;"	d	file:
 MAXERROR	inc/error.h	27;"	d
 MAXFD	lib/fd.c	6;"	d	file:
@@ -374,17 +374,18 @@ MULTIBOOT_HEADER_FLAGS	kern/entry.S	/^#define MULTIBOOT_HEADER_FLAGS (MULTIBOOT_
 MULTIBOOT_HEADER_MAGIC	kern/entry.S	/^#define MULTIBOOT_HEADER_MAGIC (0x1BADB002)$/;"	d
 MULTIBOOT_MEMORY_INFO	kern/entry.S	/^#define MULTIBOOT_MEMORY_INFO (1<<1)$/;"	d
 MULTIBOOT_PAGE_ALIGN	kern/entry.S	/^#define MULTIBOOT_PAGE_ALIGN  (1<<0)$/;"	d
-NCOMMANDS	kern/monitor.c	30;"	d	file:
+NCOMMANDS	kern/monitor.c	43;"	d	file:
 NDIRECT	inc/fs.h	22;"	d
 NENV	inc/env.h	30;"	d
 NINDIRECT	inc/fs.h	24;"	d
-NO	kern/console.c	204;"	d	file:
+NO	kern/console.c	211;"	d	file:
 NPDENTRIES	inc/mmu.h	47;"	d
 NPTENTRIES	inc/mmu.h	48;"	d
 NSYSCALLS	inc/syscall.h	/^	NSYSCALLS$/;"	e	enum:__anon4
 NULL	inc/stdio.h	7;"	d
 NULL	inc/types.h	5;"	d
-NUMLOCK	kern/console.c	211;"	d	file:
+NUMLOCK	kern/console.c	218;"	d	file:
+NUSER	kern/monitor.c	27;"	d	file:
 NVRAM_BASEHI	kern/kclock.h	16;"	d
 NVRAM_BASELO	kern/kclock.h	15;"	d
 NVRAM_CENTURY	kern/kclock.h	27;"	d
@@ -418,14 +419,14 @@ N_SO	inc/stab.h	27;"	d
 N_SOL	inc/stab.h	30;"	d
 N_SSYM	inc/stab.h	26;"	d
 N_STSYM	inc/stab.h	18;"	d
-O_ACCMODE	inc/lib.h	131;"	d
-O_CREAT	inc/lib.h	133;"	d
-O_EXCL	inc/lib.h	135;"	d
-O_MKDIR	inc/lib.h	136;"	d
-O_RDONLY	inc/lib.h	128;"	d
-O_RDWR	inc/lib.h	130;"	d
-O_TRUNC	inc/lib.h	134;"	d
-O_WRONLY	inc/lib.h	129;"	d
+O_ACCMODE	inc/lib.h	133;"	d
+O_CREAT	inc/lib.h	135;"	d
+O_EXCL	inc/lib.h	137;"	d
+O_MKDIR	inc/lib.h	138;"	d
+O_RDONLY	inc/lib.h	130;"	d
+O_RDWR	inc/lib.h	132;"	d
+O_TRUNC	inc/lib.h	136;"	d
+O_WRONLY	inc/lib.h	131;"	d
 OpenFile	fs/serv.c	/^struct OpenFile {$/;"	s	file:
 PACKAGEDATE	conf/lab.mk	/^PACKAGEDATE=Mon Nov 19 20:24:47 EST 2007$/;"	m
 PADDR	kern/pmap.h	19;"	d
@@ -436,7 +437,7 @@ PGADDR	inc/mmu.h	44;"	d
 PGOFF	inc/mmu.h	41;"	d
 PGSHIFT	inc/mmu.h	51;"	d
 PGSIZE	inc/mmu.h	50;"	d
-PIPEBUFSIZ	lib/pipe.c	20;"	d	file:
+PIPEBUFSIZ	lib/pipe.c	22;"	d	file:
 PPN	inc/mmu.h	30;"	d
 PTE_A	inc/mmu.h	65;"	d
 PTE_ADDR	inc/mmu.h	78;"	d
@@ -449,7 +450,7 @@ PTE_P	inc/mmu.h	60;"	d
 PTE_PCD	inc/mmu.h	64;"	d
 PTE_PS	inc/mmu.h	67;"	d
 PTE_PWT	inc/mmu.h	63;"	d
-PTE_SHARE	inc/lib.h	76;"	d
+PTE_SHARE	inc/lib.h	78;"	d
 PTE_U	inc/mmu.h	62;"	d
 PTE_USER	inc/mmu.h	75;"	d
 PTE_W	inc/mmu.h	61;"	d
@@ -467,7 +468,7 @@ RELOC	kern/entry.S	/^#define	RELOC(x) ((x) - KERNBASE)$/;"	d
 REQVA	fs/serv.c	31;"	d	file:
 ROUNDDOWN	inc/types.h	57;"	d
 ROUNDUP	inc/types.h	63;"	d
-SCROLLLOCK	kern/console.c	212;"	d	file:
+SCROLLLOCK	kern/console.c	219;"	d	file:
 SECTSIZE	boot/main.c	32;"	d	file:
 SECTSIZE	fs/fs.h	4;"	d
 SEG	inc/mmu.h	144;"	d
@@ -479,7 +480,7 @@ SEG_NULL	inc/mmu.h	170;"	d
 SETCALLGATE	inc/mmu.h	291;"	d
 SETDATA	kern/trapentry.S	/^#define SETDATA(name) .data;.long name; $/;"	d
 SETGATE	inc/mmu.h	277;"	d
-SHIFT	kern/console.c	206;"	d	file:
+SHIFT	kern/console.c	213;"	d	file:
 SIZEOF_STRUCT_TRAPFRAME	inc/trap.h	90;"	d
 SRL	kern/entry.S	/^#define SRL(val, shamt)		(((val) >> (shamt)) & ~(-1 << (32 - (shamt))))$/;"	d
 STA_A	inc/mmu.h	191;"	d
@@ -500,7 +501,7 @@ STS_T32B	inc/mmu.h	202;"	d
 STS_TG	inc/mmu.h	198;"	d
 STS_TG16	inc/mmu.h	200;"	d
 STS_TG32	inc/mmu.h	205;"	d
-SYMBOLS	user/sh.c	230;"	d	file:
+SYMBOLS	user/sh.c	233;"	d	file:
 SYS_cgetc	inc/syscall.h	/^	SYS_cgetc,$/;"	e	enum:__anon4
 SYS_cputs	inc/syscall.h	/^	SYS_cputs = 0,$/;"	e	enum:__anon4
 SYS_env_destroy	inc/syscall.h	/^	SYS_env_destroy,$/;"	e	enum:__anon4
@@ -515,6 +516,7 @@ SYS_ipc_try_send	inc/syscall.h	/^	SYS_ipc_try_send,$/;"	e	enum:__anon4
 SYS_page_alloc	inc/syscall.h	/^	SYS_page_alloc,$/;"	e	enum:__anon4
 SYS_page_map	inc/syscall.h	/^	SYS_page_map,$/;"	e	enum:__anon4
 SYS_page_unmap	inc/syscall.h	/^	SYS_page_unmap,$/;"	e	enum:__anon4
+SYS_set_shforkid	inc/syscall.h	/^	SYS_set_shforkid,$/;"	e	enum:__anon4
 SYS_yield	inc/syscall.h	/^	SYS_yield,$/;"	e	enum:__anon4
 Secthdr	inc/elf.h	/^struct Secthdr {$/;"	s
 Segdesc	inc/mmu.h	/^struct Segdesc {$/;"	s
@@ -584,14 +586,15 @@ UTrapframe	inc/trap.h	/^struct UTrapframe {$/;"	s
 UVPT	inc/memlayout.h	105;"	d
 UXSTACKTOP	inc/memlayout.h	118;"	d
 UserStabData	kern/kdebug.c	/^struct UserStabData {$/;"	s	file:
+Username_Password	kern/monitor.c	/^struct Username_Password {$/;"	s	file:
 V	conf/env.mk	/^V = @$/;"	m
 VA	user/testptelibrary.c	3;"	d	file:
 VA	user/testpteshare.c	3;"	d	file:
 VPD	inc/mmu.h	35;"	d
 VPN	inc/mmu.h	31;"	d
 VPT	inc/memlayout.h	94;"	d
-WHITESPACE	kern/monitor.c	92;"	d	file:
-WHITESPACE	user/sh.c	229;"	d	file:
+WHITESPACE	kern/monitor.c	115;"	d	file:
+WHITESPACE	user/sh.c	232;"	d	file:
 _ARGSET	inc/args.h	76;"	d
 _ARGUSED	inc/args.h	77;"	d
 _BSD_EXTENSION	fs/fsformat.c	5;"	d	file:
@@ -673,6 +676,7 @@ cons_intr	kern/console.c	/^cons_intr(int (*proc)(void))$/;"	f
 cons_putc	kern/console.c	/^cons_putc(int c)$/;"	f
 cons_read	lib/console.c	/^cons_read(struct Fd *fd, void *vbuf, size_t n, off_t offset)$/;"	f
 cons_stat	lib/console.c	/^cons_stat(struct Fd *fd, struct Stat *stat)$/;"	f
+cons_trunc	lib/console.c	/^cons_trunc(struct Fd *fd, off_t newsize)$/;"	f
 cons_write	lib/console.c	/^cons_write(struct Fd *fd, const void *vbuf, size_t n, off_t offset)$/;"	f
 continuetest	grade.sh	/^continuetest () {$/;"	f
 cprintf	kern/printf.c	/^cprintf(const char *fmt, ...)$/;"	f
@@ -902,6 +906,7 @@ lidt	inc/x86.h	/^lidt(void *p)$/;"	f
 line	user/num.c	/^int line = 0;$/;"	v
 lldt	inc/x86.h	/^lldt(uint16_t sel)$/;"	f
 load_icode	kern/env.c	/^load_icode(struct Env *e, uint8_t *binary, size_t size)$/;"	f	file:
+login	kern/monitor.c	/^login()$/;"	f
 lpt_putc	kern/console.c	/^lpt_putc(int c)$/;"	f	file:
 ls	user/ls.c	/^ls(const char *path, const char *prefix)$/;"	f
 ls1	user/ls.c	/^ls1(const char *prefix, bool isdir, off_t size, const char *name)$/;"	f
@@ -1009,6 +1014,7 @@ pageref	lib/pageref.c	/^pageref(void *v)$/;"	f
 pages	kern/pmap.c	/^struct Page* pages;		\/\/ Virtual address of physical page array$/;"	v	typeref:struct:Page
 panic	inc/assert.h	12;"	d
 panicstr	kern/init.c	/^static const char *panicstr;$/;"	v	file:
+password	kern/monitor.c	/^	const char * password;$/;"	m	struct:Username_Password	file:
 pd_base	inc/mmu.h	/^	uint32_t pd_base;		\/\/ Base address$/;"	m	struct:Pseudodesc
 pd_lim	inc/mmu.h	/^	uint16_t pd_lim;		\/\/ Limit$/;"	m	struct:Pseudodesc
 pde_t	inc/memlayout.h	/^typedef uint32_t pde_t;$/;"	t
@@ -1022,6 +1028,7 @@ pipeclose	lib/pipe.c	/^pipeclose(struct Fd *fd)$/;"	f	file:
 pipeisclosed	lib/pipe.c	/^pipeisclosed(int fdnum)$/;"	f
 piperead	lib/pipe.c	/^piperead(struct Fd *fd, void *vbuf, size_t n, off_t offset)$/;"	f	file:
 pipestat	lib/pipe.c	/^pipestat(struct Fd *fd, struct Stat *stat)$/;"	f	file:
+pipetrunc	lib/pipe.c	/^pipetrunc(struct Fd *fd, off_t size)$/;"	f
 pipewrite	lib/pipe.c	/^pipewrite(struct Fd *fd, const void *vbuf, size_t n, off_t offset)$/;"	f	file:
 pp_link	inc/memlayout.h	/^	Page_LIST_entry_t pp_link;	\/* free list link *\/$/;"	m	struct:Page
 pp_ref	inc/memlayout.h	/^	uint16_t pp_ref;$/;"	m	struct:Page
@@ -1109,6 +1116,7 @@ sd_p	inc/mmu.h	/^	unsigned sd_p : 1;          \/\/ Present$/;"	m	struct:Segdesc
 sd_rsv1	inc/mmu.h	/^	unsigned sd_rsv1 : 1;       \/\/ Reserved$/;"	m	struct:Segdesc
 sd_s	inc/mmu.h	/^	unsigned sd_s : 1;          \/\/ 0 = system, 1 = application$/;"	m	struct:Segdesc
 sd_type	inc/mmu.h	/^	unsigned sd_type : 4;       \/\/ Segment type (see STS_ constants)$/;"	m	struct:Segdesc
+secretreadline	lib/readline.c	/^secretreadline(const char *prompt)$/;"	f
 seed	kern/sched.c	/^uint32_t seed = 1;$/;"	v
 seek	lib/fd.c	/^seek(int fdnum, off_t offset)$/;"	f
 segment_alloc	kern/env.c	/^segment_alloc(struct Env *e, void *va, size_t len)$/;"	f	file:
@@ -1139,6 +1147,7 @@ sh_name	inc/elf.h	/^	uint32_t sh_name;$/;"	m	struct:Secthdr
 sh_offset	inc/elf.h	/^	uint32_t sh_offset;$/;"	m	struct:Secthdr
 sh_size	inc/elf.h	/^	uint32_t sh_size;$/;"	m	struct:Secthdr
 sh_type	inc/elf.h	/^	uint32_t sh_type;$/;"	m	struct:Secthdr
+shforkid	kern/env.c	/^envid_t shforkid;$/;"	v
 shiftcode	kern/console.c	/^static uint8_t shiftcode[256] = $/;"	v	file:
 shiftmap	kern/console.c	/^static uint8_t shiftmap[256] = $/;"	v	file:
 size_t	inc/types.h	/^typedef uint32_t size_t;$/;"	t
@@ -1212,6 +1221,8 @@ sys_page_map	kern/syscall.c	/^sys_page_map(envid_t srcenvid, void *srcva,$/;"	f	
 sys_page_map	lib/syscall.c	/^sys_page_map(envid_t srcenv, void *srcva, envid_t dstenv, void *dstva, int perm)$/;"	f
 sys_page_unmap	kern/syscall.c	/^sys_page_unmap(envid_t envid, void *va)$/;"	f	file:
 sys_page_unmap	lib/syscall.c	/^sys_page_unmap(envid_t envid, void *va)$/;"	f
+sys_set_shforkid	kern/syscall.c	/^sys_set_shforkid(envid_t envid)$/;"	f	file:
+sys_set_shforkid	lib/syscall.c	/^sys_set_shforkid(envid_t envid)$/;"	f
 sys_yield	kern/syscall.c	/^sys_yield(void)$/;"	f	file:
 sys_yield	lib/syscall.c	/^sys_yield(void)$/;"	f
 syscall	kern/syscall.c	/^syscall(uint32_t syscallno, uint32_t a1, uint32_t a2, uint32_t a3, uint32_t a4, uint32_t a5)$/;"	f
@@ -1323,6 +1334,8 @@ used	fs/fsformat.c	/^	uint32_t used;$/;"	m	struct:Block	file:
 user_mem_assert	kern/pmap.c	/^user_mem_assert(struct Env *env, const void *va, size_t len, int perm)$/;"	f
 user_mem_check	kern/pmap.c	/^user_mem_check(struct Env *env, const void *va, size_t len, int perm)$/;"	f
 user_mem_check_addr	kern/pmap.c	/^static uintptr_t user_mem_check_addr;$/;"	v	file:
+username	kern/monitor.c	/^	const char * username;$/;"	m	struct:Username_Password	file:
+username_passwords	kern/monitor.c	/^static struct Username_Password username_passwords[] = {$/;"	v	typeref:struct:Username_Password	file:
 utf_eflags	inc/trap.h	/^	uint32_t utf_eflags;$/;"	m	struct:UTrapframe
 utf_eip	inc/trap.h	/^	uintptr_t utf_eip;$/;"	m	struct:UTrapframe
 utf_err	inc/trap.h	/^	uint32_t utf_err;$/;"	m	struct:UTrapframe

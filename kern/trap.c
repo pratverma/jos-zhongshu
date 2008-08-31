@@ -156,6 +156,10 @@ trap_dispatch(struct Trapframe *tf)
 	// LAB 3: Your code here.
  	switch(tf->tf_trapno)
  	{
+		case T_DEBUG:
+			cprintf("single step INT1\n");
+
+			return;
  		case T_PGFLT:
  			page_fault_handler(tf);
  			return;
@@ -229,7 +233,9 @@ trap(struct Trapframe *tf)
 	// scheduled, so we should return to the current environment
 	// if doing so makes sense.
 	if (curenv && curenv->env_status == ENV_RUNNABLE)
+	{
 		env_run(curenv);
+	}
 	else
 		sched_yield();
 }

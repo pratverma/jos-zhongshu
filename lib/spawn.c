@@ -104,10 +104,11 @@ spawn(const char *prog, const char **argv)
 	uint32_t pn = 0;
 	uintptr_t addr;
 	pte_t pte;
-
+	//cprintf("prog:%s\n",prog);
 	
 	if((fdnum = open(prog, O_RDWR)) < 0)
 		return fdnum;
+
 	read(fdnum, elfbuf, 512);
 	elf = (struct Elf *) elfbuf;
 	if(elf->e_magic != ELF_MAGIC)

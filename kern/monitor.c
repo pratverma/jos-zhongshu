@@ -6,6 +6,7 @@
 #include <inc/memlayout.h>
 #include <inc/assert.h>
 #include <inc/x86.h>
+#include <inc/mmu.h>
 
 #include <kern/console.h>
 #include <kern/monitor.h>
@@ -37,6 +38,7 @@ static struct Command commands[] = {
 	{ "help", "Display this list of commands", mon_help },
 	{ "kerninfo", "Display information about the kernel", mon_kerninfo },
 	{ "backtrace", "Display backtrace of function", mon_backtrace },
+//	{ "singlestep", "Single step through the program", mon_singlestep },
 };
 #define NCOMMANDS (sizeof(commands)/sizeof(commands[0]))
 
@@ -95,8 +97,18 @@ mon_backtrace(int argc, char **argv, struct Trapframe *tf)
 	}
 	return 0;
 }
-
-
+/*
+int
+mon_singlestep(int argc, char **argv, struct Trapframe *tf)
+{
+	asm volatile("pushfl");
+	asm volatile("popl %eax");
+	asm volatile("orl $0x100,%eax");
+	asm volatile("pushl %eax");
+	asm volatile("popfl");
+	return 1;
+}
+*/
 
 /***** Kernel monitor command interpreter *****/
 
@@ -146,6 +158,7 @@ void
 monitor(struct Trapframe *tf)
 {
 	char *buf;
+	int r;
 
 	cprintf("Welcome to the JOS kernel monitor!\n");
 	cprintf("Type 'help' for a list of commands.\n");
@@ -156,8 +169,12 @@ monitor(struct Trapframe *tf)
 	while (1) {
 		buf = readline("K> ");
 		if (buf != NULL)
-			if (runcmd(buf, tf) < 0)
+		{
+			if ((r = runcmd(buf, tf)) < 0)
 				break;
+		}
+			
+
 	}
 }
 
