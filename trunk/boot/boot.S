@@ -41,6 +41,21 @@ seta20.2:
   movb    $0xdf,%al               # 0xdf -> port 0x60
   outb    %al,$0x60
 
+  # Detect physical memory
+  # Probably the easiest is to modify the boot loader 
+  # to use e801/e820 int 0x15 calls while still in 16-bit mode
+  # and then pass the results through bootmain into _start.
+  xorw %cx,%cx
+  xorw %dx,%dx
+  movw $0xE801,%ax
+  int  $0x15
+  movw %ax,%cx
+  movw %bx,%dx
+  andl $0xffff, %edx
+  shll $6,%edx
+  andl $0xffff,%ecx
+  addl %ecx,%edx
+
   # Switch from real to protected mode, using a bootstrap GDT
   # and segment translation that makes virtual addresses 
   # identical to their physical addresses, so that the 
@@ -65,7 +80,9 @@ protcseg:
   movw    %ax, %ss                # -> SS: Stack Segment
   
   # Set up the stack pointer and call into C.
+  # push the memory size as the parameter
   movl    $start, %esp
+  pushl %edx
   call bootmain
 
   # If bootmain returns (it shouldn't), loop.

@@ -19,45 +19,28 @@ void (*_pgfault_handler)(struct UTrapframe *utf);
 // at UXSTACKTOP), and tell the kernel to call the assembly-language
 // _pgfault_upcall routine when a page fault occurs.
 //
-/*
-void
-set_pgfault_handler(void (*handler)(struct UTrapframe *utf))
-{
-	int r;
 
-	if (_pgfault_handler == 0) {
-		// First time through!
-		// LAB 4: Your code here.
-		envid_t envid = sys_getenvid();
-		cprintf("set page fault handler:%08x\n",envid);
-		sys_env_set_pgfault_upcall(envid, _pgfault_upcall);
-		sys_page_alloc(envid,(void*)(UXSTACKTOP - PGSIZE),PTE_U|PTE_W|PTE_P);
-		//panic("set_pgfault_handler not implemented");
-	}
-
-	// Save handler pointer for assembly to call.
-	_pgfault_handler = handler;
-}
-*/
 
 
 void
 set_pgfault_handler(void (*handler)(struct UTrapframe *utf))
 {
+	//cprintf("set page fault handler:%08x!!\n",set_pgfault_handler);
 	int r;
 	if (_pgfault_handler == 0) {
-		// First time through!
+		//cprintf("First time through!\n");
 		// LAB 4: Your code here.
 		if ((r = sys_page_alloc(0, (void *)(UXSTACKTOP-PGSIZE),
 								PTE_U | PTE_W | PTE_P)) < 0)
 			panic("set_pgfault_handler: page alloc error: %e", r);
+		// register the env pgfault upcall
+		if ((r = sys_env_set_pgfault_upcall(0, _pgfault_upcall)) < 0)
+			panic("set_pgfault_handler: set pgfault upcall error: %e", r);
 	}
 
 	// Save handler pointer for assembly to call.
 	_pgfault_handler = handler;
 
-	// register the env pgfault upcall
-	if ((r = sys_env_set_pgfault_upcall(0, _pgfault_upcall)) < 0)
-		panic("set_pgfault_handler: set pgfault upcall error: %e", r);
+
 }
 

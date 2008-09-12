@@ -15,7 +15,7 @@
 
 
 void
-i386_init(void)
+i386_init(uint32_t memsize)
 {
 	extern char etext[],edata[], end[];
 
@@ -46,7 +46,7 @@ i386_init(void)
 	cprintf("etext:%08x,edata:%08x,end:%08x\n",etext,edata,end);
 
 	// Lab 2 memory management initialization functions
-	i386_detect_memory();
+	i386_detect_memory(memsize);
 	i386_vm_init();
 
 	// Lab 3 user environment initialization functions
@@ -67,7 +67,7 @@ i386_init(void)
 	ENV_CREATE2(TEST, TESTSIZE);
 #else
 	// Touch all you want.
-	//ENV_CREATE(user_testpiperace);
+	ENV_CREATE(user_fairness);
 	//ENV_CREATE(user_pipereadeof);
 	// ENV_CREATE(user_pipewriteeof);
 #endif

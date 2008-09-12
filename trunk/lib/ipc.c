@@ -59,15 +59,9 @@ ipc_send(envid_t to_env, uint32_t val, void *pg, int perm)
 	while(1)
 	{
 		ret = sys_ipc_try_send(to_env,val,srcva,perm);
-		if(ret == 0)		
+		if(ret == 0 || ret == 1)		
 		{
 			//cprintf("return 0\n");
-			sys_yield();
-			break;
-		}
-		else if(ret == 1)
-		{
-			//cprintf("return 1\n");
 			sys_yield();
 			break;
 		}

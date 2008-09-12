@@ -43,6 +43,7 @@
 .globl		_start
 _start:
 	movw	$0x1234,0x472			# warm boot
+	movl    4(%esp),%edx
 
 	# Establish our own GDT in place of the boot loader's temporary GDT.
 	lgdt	RELOC(mygdtdesc)		# load descriptor table
@@ -66,6 +67,7 @@ relocated:
 	movl	$(bootstacktop-SIZEOF_STRUCT_TRAPFRAME),%esp
 
 	# now to C code
+	pushl   %edx
 	call	i386_init
 
 	# Should never get here, but in case we do, just spin.
