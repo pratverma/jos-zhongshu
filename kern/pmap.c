@@ -70,15 +70,10 @@ nvram_read(int r)
 }
 
 void
-i386_detect_memory(void)
+i386_detect_memory(uint32_t memsize)
 {
-	// CMOS tells us how many bytes there are
-	
-	//0x15 0x16 from cmos memory for base memory 
 	basemem = ROUNDDOWN(nvram_read(NVRAM_BASELO)*1024, PGSIZE);
-	//0x17 0x18 from cmos memory for extent memory
 	extmem = ROUNDDOWN(nvram_read(NVRAM_EXTLO)*1024, PGSIZE);
-
 	// Calculate the maximum physical address based on whether
 	// or not there is any extended memory.  See comment in <inc/mmu.h>.
 	if (extmem)
@@ -86,10 +81,10 @@ i386_detect_memory(void)
 	else
 		maxpa = basemem;
 
+	size_t physicalmem = ROUNDDOWN(memsize*1024, PGSIZE);
+	maxpa = (physicalmem > maxpa) ? physicalmem : maxpa;
 	npage = maxpa / PGSIZE;
-
-	cprintf("Physical memory: %dK available, ", (int)(maxpa/1024));
-	cprintf("base = %dK, extended = %dK\n", (int)(basemem/1024), (int)(extmem/1024));
+	cprintf("Base Memory: %dK,Physical memory: %dK available\n",(int)(basemem/1024), (int)(maxpa/1024));
 }
 
 // --------------------------------------------------------------

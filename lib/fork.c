@@ -129,7 +129,7 @@ fork(void)
 	uint32_t pdeno,pteno;
 	int r;
 	uint32_t pn = 0;
-	extern unsigned char end[];	
+	extern unsigned char end[];
 	set_pgfault_handler(pgfault);
 	envid = sys_exofork();
 	//cprintf("envid:%08x,end:%08x,UTOP:%08x\n",envid,end,UTOP);
@@ -171,7 +171,11 @@ fork(void)
 	}
 	
 	//use sys_for_fork to substitue a batch of syscalls
-	//e.g sys_page_alloc sys_env_set_pgfault_upcall and SYS_env_set_status
+	//e.g sys_page_alloc sys_env_set_pgfault_upcall and sys_env_set_status
+	//alloc page for UXSTACKTOP and set the pgfault_upcall
+	//Though I think that set _pgfault_upcall is not necessary
+	
+	
    	if((r = sys_for_fork(envid, (void*)(UXSTACKTOP-PGSIZE), 
 					PTE_U|PTE_P|PTE_W, _pgfault_upcall,ENV_RUNNABLE) < 0))
 		panic("sys_for_fork error: %e", r);

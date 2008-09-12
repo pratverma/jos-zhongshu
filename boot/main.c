@@ -36,7 +36,7 @@ void readsect(void*, uint32_t);
 void readseg(uint32_t, uint32_t, uint32_t);
 
 void
-bootmain(void)
+bootmain(uint32_t memsize)
 {
 	struct Proghdr *ph, *eph;
 
@@ -52,6 +52,12 @@ bootmain(void)
 	eph = ph + ELFHDR->e_phnum;
 	for (; ph < eph; ph++)
 		readseg(ph->p_va, ph->p_memsz, ph->p_offset);
+
+	
+	//pass the memsize as the parameter to the entry of kernel
+	__asm __volatile("movl %%ecx,%%eax\n\t"
+			 "pushl %%eax"::"c"(memsize));
+
 
 	// call the entry point from the ELF header
 	// note: does not return!
