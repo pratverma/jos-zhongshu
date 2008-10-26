@@ -301,12 +301,12 @@ page_fault_handler(struct Trapframe *tf)
 		return;
 	}
 	//cprintf("check %08x whether the user exception stack is accessible\n",curenv->env_id);
-	user_mem_assert(curenv, (void *)(UXSTACKTOP-4), 4,
-					PTE_P | PTE_W | PTE_U);
+	//user_mem_assert(curenv, (void *)(UXSTACKTOP-4), 4,
+	//				PTE_P | PTE_W | PTE_U);
 	// added according to 'faultbadhandler' to check whether
 	//cprintf("check %08x the page fault installed is accessible to the user\n",curenv->env_id);
-	user_mem_assert(curenv, (void *)(curenv->env_pgfault_upcall), 4,
-					PTE_P | PTE_U);
+	//user_mem_assert(curenv, (void *)(curenv->env_pgfault_upcall), 4,
+	//				PTE_P | PTE_U);
 	// initialize the utf according to tf
 	utf.utf_fault_va = fault_va;
 	//cprintf("fault va:%08x\n",fault_va);

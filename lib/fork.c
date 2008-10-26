@@ -176,8 +176,7 @@ fork(void)
 	//Though I think that set _pgfault_upcall is not necessary
 	
 	
-   	if((r = sys_for_fork(envid, (void*)(UXSTACKTOP-PGSIZE), 
-					PTE_U|PTE_P|PTE_W, _pgfault_upcall,ENV_RUNNABLE) < 0))
+   	if((r = sys_for_fork(envid, _pgfault_upcall, ENV_RUNNABLE) < 0))
 		panic("sys_for_fork error: %e", r);
 	return envid;
 

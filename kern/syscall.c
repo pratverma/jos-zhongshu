@@ -110,12 +110,15 @@ sys_exofork(void)
 		child->env_pgfault_upcall = curenv->env_pgfault_upcall;
 		//	cprintf("curenv->env_tf:%08x\n",curenv->env_tf);
 		child->env_tf.tf_regs.reg_eax = 0;
+
+
 		return child->env_id;
 	}
 		       	
 
 	//panic("sys_exofork not implemented");
 }
+
 
 // Set envid's env_status to status, which must be ENV_RUNNABLE
 // or ENV_NOT_RUNNABLE.
@@ -264,7 +267,9 @@ sys_page_alloc(envid_t envid, void *va, int perm)
 	struct Page * page;
 	if(page_alloc(&page) == -E_NO_MEM)
 		return -E_NO_MEM;
-	//cprintf("page alloc:%08x,env:%08x\n",page,*env);
+	//cprintf("page alloc kva:%08x\n",page2kva(page));
+	// At this time, we use the page table of the kernel
+	// so we clear the phsical page according to the kernel virtual address 
 	memset(page2kva(page),0x0,PGSIZE);
 	//cprintf("page insert,env_id:%08x,env_pgdir:%08x,page:%08x,va:%08x\n",
 	//		env->env_id,env->env_pgdir,page,va);
@@ -486,16 +491,25 @@ sys_ipc_recv(void *dstva)
 	return 0;
 }
 
+
 //new added sys_for_fork to 
 //augment the system call interface 
 //so that it is possible to send a batch of system calls at once
 //because switching into the kernel has non-trivial cost!!!
 static int
-sys_for_fork(envid_t envid, void * va, int perm, void * func, int status)
+sys_for_fork(envid_t envid, void * func, int status)
 {
 	int r;
+	int perm = PTE_W|PTE_P|PTE_U;
+	void * va = (void*)(UXSTACKTOP - PGSIZE);
+
 	if((r = sys_page_alloc(envid, va, perm)) < 0)
-		return r;
+			return r;
+	if ((r = sys_page_map(envid, va, curenv->env_id, UTEMP, perm)) < 0)
+			panic("sys_page_map: %e", r);
+	memmove(UTEMP, va, PGSIZE);
+	if ((r = sys_page_unmap(curenv->env_id, UTEMP)) < 0)
+			panic("sys_page_unmap: %e", r);
 	if ((r = sys_env_set_pgfault_upcall(envid, func)) < 0)
 		return r;
 	if ((r = sys_env_set_status(envid, status)) < 0)
@@ -568,7 +582,7 @@ syscall(uint32_t syscallno, uint32_t a1, uint32_t a2, uint32_t a3, uint32_t a4, 
 			result = sys_ipc_try_send((envid_t)a1, (uint32_t)a2, (void *)a3, (unsigned)a4);
 			break;
 		case SYS_for_fork:
-			result = sys_for_fork((envid_t)a1, (void *)a2, (int)a3,(void *)a4, (int)a5);
+			result = sys_for_fork((envid_t)a1, (void *)a2, (int)a3);
 			break;
 		case SYS_set_shforkid:
 			result = sys_set_shforkid((envid_t)a1);
