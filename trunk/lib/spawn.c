@@ -300,7 +300,8 @@ init_stack(envid_t child, const char **argv, uintptr_t *init_esp)
 		goto error;
 	if ((r = sys_page_unmap(0, UTEMP)) < 0)
 		goto error;
-
+	if ((r = sys_page_alloc(0, (void*) (UXSTACKTOP - PGSIZE), PTE_P|PTE_U|PTE_W)) < 0)
+		return r;
 	return 0;
 
 error:

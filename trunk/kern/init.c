@@ -75,8 +75,8 @@ i386_init(uint32_t memsize)
 	// Should not be necessary - drain keyboard because interrupt has given up.
 	kbd_intr();
 
-	while(login() != 0)
-		continue;
+	//while(login() != 0)
+	//	continue;
 	// Schedule and run the first user environment!
 	sched_yield();
 
